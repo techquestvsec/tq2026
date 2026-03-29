@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TechQuest 2026 – Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #050a0f;
+  --surface: #0d1820;
+  --surface2: #132030;
+  --accent: #00e5ff;
+  --accent2: #ff6b35;
+  --green: #00ff9d;
+  --red: #e05c6b;
+  --text: #c8dde8;
+  --muted: #4a6275;
+  --border: rgba(0,229,255,0.15);
+  --border-hover: rgba(0,229,255,0.45);
+}
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+html,body { height:100%; }
+body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; font-size:14px; overflow-x:hidden; }
+body::before { content:''; position:fixed; inset:0; background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.025) 2px,rgba(0,0,0,0.025) 4px); pointer-events:none; z-index:9999; }
+
+/* ── LOGIN ── */
+#loginScreen { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; background:radial-gradient(ellipse at 50% 0%,rgba(0,229,255,0.07) 0%,transparent 60%); }
+.login-card { width:100%; max-width:400px; background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:44px 40px; box-shadow:0 0 60px rgba(0,229,255,0.1); animation:fadeUp 0.4s ease; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);} }
+.login-logo { text-align:center; margin-bottom:32px; }
+.logo-main { font-family:'Orbitron',sans-serif; font-size:22px; font-weight:900; background:linear-gradient(135deg,var(--accent),#0099bb); -webkit-background-clip:text; -webkit-text-fill-color:transparent; letter-spacing:4px; }
+.logo-sub  { font-size:10px; color:var(--accent2); letter-spacing:4px; text-transform:uppercase; margin-top:6px; }
+.logo-badge { display:inline-block; font-family:'Orbitron',sans-serif; font-size:10px; color:var(--muted); border:1px solid var(--border); border-radius:4px; padding:2px 10px; margin-top:8px; letter-spacing:2px; }
+.form-group { margin-bottom:18px; }
+.form-group label { display:block; font-size:10px; text-transform:uppercase; letter-spacing:1.5px; color:var(--muted); margin-bottom:8px; }
+.form-group input { width:100%; background:var(--surface2); border:1px solid rgba(0,229,255,0.1); border-radius:8px; padding:12px 16px; color:var(--text); font-family:'DM Sans',sans-serif; font-size:14px; outline:none; transition:border 0.2s,box-shadow 0.2s; }
+.form-group input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(0,229,255,0.1); }
+.form-group input::placeholder { color:var(--muted); }
+.btn-login { width:100%; background:var(--accent); color:#000; border:none; border-radius:8px; padding:13px; font-family:'Orbitron',sans-serif; font-size:12px; font-weight:700; letter-spacing:2px; text-transform:uppercase; cursor:pointer; transition:all 0.2s; margin-top:6px; }
+.btn-login:hover { background:#33ecff; box-shadow:0 0 20px rgba(0,229,255,0.4); transform:translateY(-1px); }
+.btn-login:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
+.error-msg { color:var(--red); font-size:12px; margin-top:12px; text-align:center; display:none; }
+
+/* ── HEADER ── */
+#header { display:none; position:fixed; top:0; left:0; right:0; height:58px; background:rgba(5,10,15,0.95); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); z-index:200; padding:0 24px; align-items:center; justify-content:space-between; }
+#header.visible { display:flex; }
+.header-logo { font-family:'Orbitron',sans-serif; font-size:15px; font-weight:700; color:var(--accent); letter-spacing:3px; cursor:pointer; }
+.header-center { font-size:10px; color:var(--muted); letter-spacing:3px; text-transform:uppercase; }
+.btn-logout { background:transparent; color:var(--red); border:1px solid rgba(224,92,107,0.4); border-radius:6px; padding:6px 14px; font-family:'Orbitron',sans-serif; font-size:9px; letter-spacing:1px; text-transform:uppercase; cursor:pointer; transition:all 0.2s; }
+.btn-logout:hover { background:rgba(224,92,107,0.1); }
+
+/* ── LAYOUT ── */
+#adminApp { display:none; padding-top:58px; height:100vh; }
+#adminApp.visible { display:flex; }
+
+.left-panel { width:260px; flex-shrink:0; background:var(--surface); border-right:1px solid var(--border); display:flex; flex-direction:column; overflow:hidden; }
+.panel-header { padding:20px; border-bottom:1px solid var(--border); }
+.panel-title { font-family:'Orbitron',sans-serif; font-size:11px; font-weight:700; color:var(--accent); letter-spacing:2px; text-transform:uppercase; margin-bottom:12px; }
+.search-input { width:100%; background:var(--surface2); border:1px solid rgba(0,229,255,0.1); border-radius:6px; padding:9px 12px; color:var(--text); font-family:'DM Sans',sans-serif; font-size:13px; outline:none; transition:border 0.2s; }
+.search-input:focus { border-color:var(--accent); }
+.search-input::placeholder { color:var(--muted); }
+.events-list { flex:1; overflow-y:auto; padding:12px; }
+.events-list::-webkit-scrollbar { width:4px; }
+.events-list::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+.event-item { padding:12px; border-radius:8px; cursor:pointer; transition:all 0.15s; border:1px solid transparent; margin-bottom:6px; display:flex; align-items:center; justify-content:space-between; }
+.event-item:hover { background:var(--surface2); border-color:var(--border); }
+.event-item.active { background:rgba(0,229,255,0.06); border-color:var(--accent); }
+.event-item-name { font-size:13px; font-weight:500; }
+.event-item.active .event-item-name { color:var(--accent); }
+.event-count-badge { background:var(--surface2); color:var(--accent); border:1px solid var(--border); border-radius:4px; padding:2px 8px; font-size:10px; font-family:'Orbitron',sans-serif; flex-shrink:0; }
+
+.right-panel { flex:1; overflow-y:auto; padding:28px 32px; }
+.right-panel::-webkit-scrollbar { width:5px; }
+.right-panel::-webkit-scrollbar-thumb { background:var(--border); }
+
+/* ── EVENT HEADER ── */
+.event-header-section { margin-bottom:24px; }
+.event-title { font-family:'Orbitron',sans-serif; font-size:22px; font-weight:700; color:var(--accent); letter-spacing:2px; margin-bottom:16px; }
+.stats-row { display:flex; gap:16px; flex-wrap:wrap; margin-bottom:18px; }
+.stat-chip { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:10px 16px; }
+.stat-label { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; }
+.stat-value { font-family:'Orbitron',sans-serif; font-size:18px; font-weight:700; color:var(--text); }
+.action-btns { display:flex; gap:10px; flex-wrap:wrap; }
+.btn { padding:9px 16px; border-radius:6px; font-family:'Orbitron',sans-serif; font-size:10px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; cursor:pointer; border:none; transition:all 0.2s; }
+.btn:hover { transform:translateY(-1px); filter:brightness(1.1); }
+.btn:active { transform:translateY(0); }
+.btn:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+.btn-orange { background:var(--accent2); color:#fff; }
+.btn-green  { background:var(--green); color:#000; }
+.btn-cyan   { background:var(--accent); color:#000; }
+.btn-red    { background:var(--red); color:#fff; }
+.btn-muted  { background:var(--surface2); color:var(--text); border:1px solid var(--border); }
+
+/* ── TABS ── */
+.tabs { display:flex; border-bottom:1px solid var(--border); margin-bottom:18px; }
+.tab { padding:10px 20px; font-family:'Orbitron',sans-serif; font-size:10px; letter-spacing:1.5px; text-transform:uppercase; cursor:pointer; color:var(--muted); border-bottom:2px solid transparent; transition:all 0.15s; background:transparent; border-top:none; border-left:none; border-right:none; }
+.tab:hover { color:var(--text); }
+.tab.active { color:var(--accent); border-bottom-color:var(--accent); }
+
+/* ── FILTER ROW ── */
+.filter-row { display:flex; gap:10px; margin-bottom:16px; align-items:center; flex-wrap:wrap; }
+.filter-input { background:var(--surface2); border:1px solid rgba(0,229,255,0.1); border-radius:6px; padding:9px 12px; color:var(--text); font-family:'DM Sans',sans-serif; font-size:13px; outline:none; width:220px; transition:border 0.2s; }
+.filter-input:focus { border-color:var(--accent); }
+.filter-input::placeholder { color:var(--muted); }
+.sort-select { background:var(--surface2); border:1px solid rgba(0,229,255,0.1); border-radius:6px; padding:9px 12px; color:var(--text); font-family:'DM Sans',sans-serif; font-size:13px; outline:none; cursor:pointer; }
+.sort-dir-btn { background:var(--surface2); border:1px solid rgba(0,229,255,0.1); border-radius:6px; padding:9px 12px; color:var(--accent); font-size:14px; cursor:pointer; transition:all 0.15s; line-height:1; }
+.sort-dir-btn:hover { border-color:var(--accent); background:rgba(0,229,255,0.06); }
+th.sortable { cursor:pointer; user-select:none; transition:color 0.15s; }
+th.sortable:hover { color:var(--text); }
+th.sortable.active { color:var(--accent); }
+.sort-arrow { margin-left:5px; font-size:10px; opacity:0.7; }
+
+/* ── TABLE ── */
+.table-wrap { overflow-x:auto; border-radius:10px; border:1px solid var(--border); }
+table { width:100%; border-collapse:collapse; min-width:640px; }
+thead th { background:var(--surface); color:var(--accent); font-family:'Orbitron',sans-serif; font-size:10px; letter-spacing:1.5px; text-transform:uppercase; padding:13px 14px; text-align:left; position:sticky; top:0; z-index:1; white-space:nowrap; }
+tbody tr { border-bottom:1px solid rgba(0,229,255,0.06); transition:background 0.1s; }
+tbody tr:hover { background:rgba(0,229,255,0.03); }
+tbody td { padding:11px 14px; font-size:13px; vertical-align:middle; }
+.scholar-cell { font-family:'Orbitron',sans-serif; font-size:11px; color:var(--accent); }
+.marks-input { background:var(--surface2); border:1px solid rgba(0,229,255,0.1); border-radius:5px; padding:5px 9px; color:var(--text); font-family:'DM Sans',sans-serif; font-size:13px; outline:none; width:72px; transition:border 0.2s,box-shadow 0.2s; }
+.marks-input:focus { border-color:var(--accent); box-shadow:0 0 0 2px rgba(0,229,255,0.1); }
+.rank-cell { font-family:'Orbitron',sans-serif; font-size:12px; }
+.rank-badge { background:var(--accent2); color:#fff; padding:3px 9px; border-radius:4px; font-size:11px; font-weight:700; }
+.rank-none { color:var(--muted); }
+.btn-select-toggle { padding:5px 12px; border-radius:20px; font-size:11px; font-weight:700; letter-spacing:0.5px; cursor:pointer; border:none; transition:all 0.2s; white-space:nowrap; }
+.btn-select-toggle.yes { background:rgba(0,255,157,0.15); color:var(--green); border:1px solid rgba(0,255,157,0.4); }
+.btn-select-toggle.yes:hover { background:rgba(0,255,157,0.25); }
+.btn-select-toggle.no { background:var(--surface2); color:var(--muted); border:1px solid var(--border); }
+.btn-select-toggle.no:hover { background:rgba(0,229,255,0.08); color:var(--text); border-color:var(--border-hover); }
+.btn-select-toggle:disabled { opacity:0.5; cursor:not-allowed; }
+.saving-dot { display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--accent); animation:pulse 0.8s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;}50%{opacity:0.3;} }
+.team-input { background:var(--surface2); border:1px solid rgba(0,229,255,0.06); border-radius:5px; padding:5px 9px; color:var(--text); font-family:'DM Sans',sans-serif; font-size:12px; outline:none; width:100px; transition:border 0.2s; }
+.team-input:focus { border-color:var(--accent); }
+
+/* ── BULK BAR ── */
+.bulk-bar { display:flex; align-items:center; gap:10px; margin-top:14px; padding:12px 16px; background:var(--surface); border:1px solid var(--border); border-radius:8px; flex-wrap:wrap; }
+.bulk-info { font-size:12px; color:var(--muted); flex:1; }
+
+/* ── EMPTY / LOADING ── */
+.empty-state { text-align:center; padding:60px 20px; color:var(--muted); }
+.empty-state .ei { font-size:40px; display:block; margin-bottom:12px; }
+.no-event-selected { display:flex; flex-direction:column; align-items:center; justify-content:center; height:60vh; color:var(--muted); gap:12px; }
+.no-event-selected .ni { font-size:48px; }
+
+/* ── MODAL ── */
+.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:500; display:none; align-items:center; justify-content:center; padding:20px; }
+.modal-overlay.open { display:flex; }
+.modal { background:var(--surface); border:1px solid var(--border-hover); border-radius:14px; padding:32px; max-width:400px; width:100%; box-shadow:0 0 60px rgba(0,229,255,0.1); animation:fadeUp 0.3s ease; }
+.modal-title { font-family:'Orbitron',sans-serif; font-size:14px; font-weight:700; color:var(--accent); letter-spacing:2px; margin-bottom:14px; }
+.modal-body { font-size:14px; color:var(--text); margin-bottom:20px; line-height:1.6; }
+.modal-input { width:100%; background:var(--surface2); border:1px solid rgba(0,229,255,0.15); border-radius:7px; padding:11px 14px; color:var(--text); font-family:'DM Sans',sans-serif; font-size:14px; outline:none; margin-bottom:16px; transition:border 0.2s; }
+.modal-input:focus { border-color:var(--accent); }
+.modal-actions { display:flex; gap:10px; justify-content:flex-end; }
+
+/* ── TOAST ── */
+#toastContainer { position:fixed; bottom:24px; right:24px; z-index:9998; display:flex; flex-direction:column; gap:10px; }
+.toast { background:var(--surface); border-radius:8px; padding:12px 18px; font-size:13px; min-width:200px; box-shadow:0 4px 20px rgba(0,0,0,0.4); animation:slideUp 0.3s ease; display:flex; align-items:center; gap:10px; }
+.toast.success { border:1px solid rgba(0,255,157,0.4); color:var(--green); }
+.toast.error   { border:1px solid rgba(224,92,107,0.4); color:var(--red); }
+@keyframes slideUp   { from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);} }
+@keyframes slideDown { from{opacity:1;transform:translateY(0);}to{opacity:0;transform:translateY(20px);} }
+
+/* ── MOBILE ── */
+.mobile-panel-toggle { display:none; position:fixed; bottom:20px; right:20px; z-index:300; background:var(--accent); color:#000; border:none; border-radius:50%; width:48px; height:48px; font-size:20px; cursor:pointer; box-shadow:0 4px 16px rgba(0,229,255,0.4); align-items:center; justify-content:center; }
+@media(max-width:900px) {
+  #adminApp.visible { flex-direction:column; height:auto; min-height:calc(100vh - 58px); }
+  .left-panel { width:100%; height:auto; max-height:0; overflow:hidden; transition:max-height 0.35s ease; border-right:none; border-bottom:1px solid var(--border); }
+  .left-panel.open { max-height:55vh; }
+  .events-list { max-height:calc(55vh - 80px); }
+  .mobile-panel-toggle { display:flex; }
+  .right-panel { padding:16px 14px; flex:1; }
+  .header-center { display:none; }
+  #header { padding:0 14px; }
+  .stats-row { gap:10px; }
+  .stat-chip { padding:8px 12px; flex:1; min-width:80px; }
+  .stat-value { font-size:15px; }
+  .action-btns { gap:8px; }
+  .btn { padding:8px 12px; font-size:9px; }
+  .filter-row { flex-wrap:wrap; gap:8px; }
+  .filter-input { width:100%; }
+  .sort-select { flex:1; }
+  .table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  table { min-width:560px; }
+  thead th { padding:11px 10px; font-size:9px; }
+  tbody td { padding:9px 10px; font-size:12px; }
+  .marks-input { width:60px; }
+  .team-input { width:80px; }
+  .bulk-bar { flex-wrap:wrap; gap:8px; }
+  .bulk-info { width:100%; }
+  .modal { padding:24px 18px; }
+  #toastContainer { bottom:14px; right:14px; left:14px; }
+  .toast { min-width:unset; width:100%; }
+}
+@media(max-width:480px) {
+  .event-title { font-size:16px; }
+  .tabs { overflow-x:auto; }
+  .tab { padding:9px 14px; font-size:9px; white-space:nowrap; }
+  .btn { padding:7px 10px; font-size:9px; letter-spacing:0.5px; }
+  .stat-chip { min-width:70px; }
+  .stat-value { font-size:13px; }
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="logo-main">TECHQUEST</div>
+      <div class="logo-sub">Admin Panel</div>
+      <div class="logo-badge">2026</div>
+    </div>
+    <div class="form-group">
+      <label for="passInput">Admin Password</label>
+      <input type="password" id="passInput" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="btn-login" id="loginBtn" onclick="doLogin()">LOGIN</button>
+    <div class="error-msg" id="loginErr">Invalid password</div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header id="header">
+  <span class="header-logo" onclick="location.reload()">TECHQUEST ADMIN</span>
+  <span class="header-center">Event Management</span>
+  <button class="btn-logout" onclick="doLogout()">Logout</button>
+</header>
+
+<!-- ADMIN APP -->
+<div id="adminApp">
+  <div class="left-panel">
+    <div class="panel-header">
+      <div class="panel-title">📊 Events</div>
+      <input class="search-input" id="eventSearch" placeholder="Search event..." oninput="filterEventList()">
+    </div>
+    <div class="events-list" id="eventsList">
+      <div class="empty-state"><span class="ei">⟳</span><small>Loading events...</small></div>
+    </div>
+  </div>
+  <div class="right-panel" id="rightPanel">
+    <div class="no-event-selected">
+      <span class="ni">🎯</span>
+      <div style="font-family:'Orbitron',sans-serif;font-size:13px;letter-spacing:2px;">SELECT AN EVENT</div>
+      <div style="font-size:13px;">Choose an event from the left panel to manage it.</div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Mark Entry -->
+<div class="modal-overlay" id="markModal">
+  <div class="modal">
+    <div class="modal-title">Set Marks</div>
+    <div class="modal-body" id="markModalBody">Apply marks to selected students.</div>
+    <input class="modal-input" type="number" id="markModalInput" placeholder="Enter marks (0–10)" min="0" max="10" step="0.1">
+    <div class="modal-actions">
+      <button class="btn btn-muted" onclick="closeModal('markModal')">Cancel</button>
+      <button class="btn btn-cyan" onclick="applyBulkMarks()">Apply</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Confirm Delete -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal">
+    <div class="modal-title" style="color:var(--red)">Confirm Remove</div>
+    <div class="modal-body" id="deleteModalBody">Remove selected students from view?</div>
+    <div class="modal-actions">
+      <button class="btn btn-muted" onclick="closeModal('deleteModal')">Cancel</button>
+      <button class="btn btn-red" onclick="confirmDelete()">Remove</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Auto Rank -->
+<div class="modal-overlay" id="rankModal">
+  <div class="modal">
+    <div class="modal-title">Auto-Rank Students</div>
+    <div class="modal-body">Rank all students in this event by marks? Higher marks = lower rank number (1 = best). Ties share the same rank.</div>
+    <div class="modal-actions">
+      <button class="btn btn-muted" onclick="closeModal('rankModal')">Cancel</button>
+      <button class="btn btn-orange" onclick="doAutoRank()">Proceed</button>
+    </div>
+  </div>
+</div>
+
+<button class="mobile-panel-toggle" id="mobilePanelToggle" onclick="toggleMobilePanel()" title="Show/hide events">☰</button>
+<div id="toastContainer"></div>
+
+<script>
+const API_URL    = 'https://script.google.com/macros/s/AKfycbwocJsGoXNoWuPPjvz5e7rorhMXzEDHNdrYlkHvCVDQZPR_50s7N4uDD9J3SQlsrvjtig/exec';
+const ADMIN_PASS = 'techquest2026';
+
+let allEvents      = {};   // { eventName: [students] }
+let eventNames     = [];
+let currentEvent   = null;
+let allStudents    = [];   // unfiltered list for current event
+let currentStudents = [];  // after filter/sort
+let currentTab     = 'ALL';
+let filterText     = '';
+let sortField      = 'name';
+let sortDir        = 'asc';
+
+// ── LOGIN ──
+window.addEventListener('load', () => {
+  if (sessionStorage.getItem('tq_admin_login')) { showApp(); fetchAllData(); }
+});
+
+function doLogin() {
+  const pass = document.getElementById('passInput').value.trim();
+  const err  = document.getElementById('loginErr');
+  err.style.display = 'none';
+  if (!pass) { err.textContent = 'Please enter password'; err.style.display = 'block'; return; }
+  if (pass !== ADMIN_PASS) { err.textContent = 'Invalid password'; err.style.display = 'block'; return; }
+  sessionStorage.setItem('tq_admin_login', 'true');
+  showApp();
+  fetchAllData();
+}
+
+function doLogout() { sessionStorage.removeItem('tq_admin_login'); location.reload(); }
+
+function showApp() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('header').classList.add('visible');
+  document.getElementById('adminApp').classList.add('visible');
+}
+
+// ── API HELPERS ──
+async function fetchAPI(url) {
+  try {
+    const res = await fetch(url, { redirect: 'follow' });
+    return JSON.parse(await res.text());
+  } catch(e) {
+    console.error('fetchAPI error:', e);
+    return null;
+  }
+}
+
+async function nocorsAction(params = {}) {
+  try {
+    const qs  = new URLSearchParams(params).toString();
+    const res = await fetch(`${API_URL}?${qs}`, { redirect: 'follow' });
+    const txt = await res.text();
+    try { return JSON.parse(txt); } catch(e) { return { success: true }; }
+  } catch(e) {
+    console.error('nocorsAction error:', e);
+    return null;
+  }
+}
+
+// ── FULL DATA LOAD (login + manual full refresh) ──
+async function fetchAllData() {
+  const list = document.getElementById('eventsList');
+  list.innerHTML = '<div class="empty-state"><span class="ei">⟳</span><small>Loading...</small></div>';
+
+  const data = await fetchAPI(`${API_URL}?path=admin/events&password=${ADMIN_PASS}`);
+  if (!data || data.error) {
+    list.innerHTML = '<div class="empty-state">Failed to load events</div>';
+    showToast('Failed to load event data', 'error');
+    return;
+  }
+
+  allEvents  = data;
+  eventNames = Object.keys(data).sort();
+  renderEventList();
+
+  if (eventNames.length > 0 && !currentEvent) {
+    selectEvent(eventNames[0]);
+  } else if (currentEvent) {
+    selectEvent(currentEvent);
+  }
+}
+
+// ── SINGLE-EVENT REFRESH (after auto-rank or explicit refresh button) ──
+// Uses ?event= filter so the backend only reads rows for this event
+async function refreshCurrentEvent() {
+  if (!currentEvent) return;
+  showToast('Refreshing event...', 'success');
+
+  const rows = await fetchAPI(`${API_URL}?path=admin/events&password=${ADMIN_PASS}&event=${encodeURIComponent(currentEvent)}`);
+  if (!rows || rows.error) { showToast('Refresh failed', 'error'); return; }
+
+  allEvents[currentEvent] = Array.isArray(rows) ? rows : [];
+  allStudents = allEvents[currentEvent];
+  renderEventList();
+  renderRightPanel();
+  showToast('Event refreshed', 'success');
+}
+
+// ── EVENT LIST ──
+function renderEventList() {
+  const list  = document.getElementById('eventsList');
+  const query = document.getElementById('eventSearch').value.toLowerCase();
+  const filtered = eventNames.filter(n => n.toLowerCase().includes(query));
+
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="empty-state" style="padding:30px 10px;font-size:12px;color:var(--muted)">No events found</div>';
+    return;
+  }
+
+  list.innerHTML = '';
+  filtered.forEach(name => {
+    const count = (allEvents[name] || []).length;
+    const item  = document.createElement('div');
+    item.className = 'event-item' + (name === currentEvent ? ' active' : '');
+    item.innerHTML = `<span class="event-item-name">${name}</span><span class="event-count-badge">${count}</span>`;
+    item.onclick = () => selectEvent(name);
+    list.appendChild(item);
+  });
+}
+
+function filterEventList() { renderEventList(); }
+
+function selectEvent(name) {
+  currentEvent = name;
+  currentTab   = 'ALL';
+  filterText   = '';
+  sortField    = 'name';
+  sortDir      = 'asc';
+  renderEventList();
+  renderRightPanel();
+  const panel = document.querySelector('.left-panel');
+  const btn   = document.getElementById('mobilePanelToggle');
+  if (panel && window.innerWidth <= 900) { panel.classList.remove('open'); if (btn) btn.textContent = '☰'; }
+}
+
+// ── RIGHT PANEL ──
+function renderRightPanel() {
+  if (!currentEvent) return;
+  allStudents = allEvents[currentEvent] || [];
+
+  const rp = document.getElementById('rightPanel');
+  rp.innerHTML = `
+    <div class="event-header-section">
+      <div class="event-title">${currentEvent}</div>
+      <div class="stats-row">
+        <div class="stat-chip"><div class="stat-label">Total</div><div class="stat-value" id="statTotal">${allStudents.length}</div></div>
+        <div class="stat-chip"><div class="stat-label">Marked</div><div class="stat-value" id="statMarked">${allStudents.filter(s=>parseFloat(s.marks)>0).length}</div></div>
+        <div class="stat-chip"><div class="stat-label">Pending</div><div class="stat-value" id="statPending">${allStudents.filter(s=>!(parseFloat(s.marks)>0)).length}</div></div>
+        <div class="stat-chip"><div class="stat-label">Selected</div><div class="stat-value" id="statSelected">${allStudents.filter(s=>String(s.selected).toUpperCase()==='TRUE').length}</div></div>
+      </div>
+      <div class="action-btns">
+        <button class="btn btn-orange" onclick="openModal('rankModal')">⚡ Auto-Rank</button>
+        <button class="btn btn-green"  onclick="exportCSV()">⬇ Export CSV</button>
+        <button class="btn btn-cyan"   onclick="refreshCurrentEvent()">↺ Refresh Event</button>
+        <button class="btn btn-muted"  onclick="fetchAllData()">↺ Full Refresh</button>
+      </div>
+    </div>
+    <div class="tabs">
+      <button class="tab ${currentTab==='ALL'     ?'active':''}" onclick="setTab('ALL')">All</button>
+      <button class="tab ${currentTab==='SELECTED'?'active':''}" onclick="setTab('SELECTED')">Selected</button>
+      <button class="tab ${currentTab==='TEAMS'   ?'active':''}" onclick="setTab('TEAMS')">Teams</button>
+    </div>
+    <div class="filter-row">
+      <input class="filter-input" id="studentFilter" placeholder="Search by scholar or name..." oninput="applyFilter()" value="${filterText}">
+      <select class="sort-select" id="sortSelect" onchange="setSort(this.value)">
+        <option value="name"      ${sortField==='name'     ?'selected':''}>Sort: Name</option>
+        <option value="scholarNo" ${sortField==='scholarNo'?'selected':''}>Sort: Scholar #</option>
+        <option value="class"     ${sortField==='class'    ?'selected':''}>Sort: Class</option>
+        <option value="marks"     ${sortField==='marks'    ?'selected':''}>Sort: Marks</option>
+        <option value="rank"      ${sortField==='rank'     ?'selected':''}>Sort: Rank</option>
+        <option value="selected"  ${sortField==='selected' ?'selected':''}>Sort: Selected</option>
+      </select>
+      <button class="sort-dir-btn" id="sortDirBtn" onclick="toggleSortDir()">${sortDir==='asc'?'↑':'↓'}</button>
+      <button class="btn btn-muted" onclick="selectAll(true)">Select All</button>
+      <button class="btn btn-muted" onclick="selectAll(false)">Deselect All</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th><input type="checkbox" class="cb-selected" id="masterCb" onchange="masterCheck(this)"></th>
+            <th class="sortable ${sortField==='scholarNo'?'active':''}" onclick="setSort('scholarNo')">Scholar #<span class="sort-arrow">${sortField==='scholarNo'?(sortDir==='asc'?'↑':'↓'):''}</span></th>
+            <th class="sortable ${sortField==='name'     ?'active':''}" onclick="setSort('name')">Name<span class="sort-arrow">${sortField==='name'?(sortDir==='asc'?'↑':'↓'):''}</span></th>
+            <th class="sortable ${sortField==='class'    ?'active':''}" onclick="setSort('class')">Class<span class="sort-arrow">${sortField==='class'?(sortDir==='asc'?'↑':'↓'):''}</span></th>
+            <th>Selected</th>
+            <th class="sortable ${sortField==='marks'    ?'active':''}" onclick="setSort('marks')">Marks<span class="sort-arrow">${sortField==='marks'?(sortDir==='asc'?'↑':'↓'):''}</span></th>
+            <th class="sortable ${sortField==='rank'     ?'active':''}" onclick="setSort('rank')">Rank<span class="sort-arrow">${sortField==='rank'?(sortDir==='asc'?'↑':'↓'):''}</span></th>
+            <th>Team</th>
+          </tr>
+        </thead>
+        <tbody id="studentTbody"></tbody>
+      </table>
+    </div>
+    <div class="bulk-bar">
+      <span class="bulk-info" id="bulkInfo">0 selected</span>
+      <button class="btn btn-cyan" onclick="openMarkModal()">Set Marks</button>
+      <button class="btn btn-red"  onclick="openDeleteModal()">Remove Selected</button>
+    </div>
+  `;
+
+  applyFilter();
+}
+
+// ── FILTER / SORT ──
+function setTab(tab) { currentTab = tab; renderRightPanel(); }
+
+function setSort(field) {
+  if (sortField === field) {
+    sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortField = field;
+    sortDir   = (field === 'marks' || field === 'rank') ? 'desc' : 'asc';
+  }
+  const sel    = document.getElementById('sortSelect');
+  const dirBtn = document.getElementById('sortDirBtn');
+  if (sel)    sel.value    = sortField;
+  if (dirBtn) dirBtn.textContent = sortDir === 'asc' ? '↑' : '↓';
+  applyFilter();
+}
+
+function toggleSortDir() {
+  sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+  const dirBtn = document.getElementById('sortDirBtn');
+  if (dirBtn) dirBtn.textContent = sortDir === 'asc' ? '↑' : '↓';
+  applyFilter();
+}
+
+function applyFilter() {
+  const query = (document.getElementById('studentFilter')?.value || '').toLowerCase();
+  filterText  = query;
+  let list    = [...allStudents];
+
+  if (currentTab === 'SELECTED') list = list.filter(s => String(s.selected).toUpperCase() === 'TRUE');
+  if (currentTab === 'TEAMS')    list = list.filter(s => s.teamName);
+  if (query) list = list.filter(s =>
+    String(s.scholarNo).toLowerCase().includes(query) ||
+    String(s.name).toLowerCase().includes(query)
+  );
+
+  list.sort((a, b) => {
+    let aVal, bVal;
+    if (sortField === 'marks' || sortField === 'rank') {
+      aVal = parseFloat(a[sortField]) || 0;
+      bVal = parseFloat(b[sortField]) || 0;
+      return sortDir === 'asc' ? aVal - bVal : bVal - aVal;
+    } else if (sortField === 'selected') {
+      aVal = String(a.selected).toUpperCase() === 'TRUE' ? 1 : 0;
+      bVal = String(b.selected).toUpperCase() === 'TRUE' ? 1 : 0;
+      return sortDir === 'asc' ? aVal - bVal : bVal - aVal;
+    } else if (sortField === 'scholarNo') {
+      aVal = parseFloat(a.scholarNo) || a.scholarNo || '';
+      bVal = parseFloat(b.scholarNo) || b.scholarNo || '';
+      if (typeof aVal === 'number') return sortDir === 'asc' ? aVal - bVal : bVal - aVal;
+    } else {
+      aVal = String(a[sortField] || '').toLowerCase();
+      bVal = String(b[sortField] || '').toLowerCase();
+    }
+    if (aVal < bVal) return sortDir === 'asc' ? -1 : 1;
+    if (aVal > bVal) return sortDir === 'asc' ?  1 : -1;
+    return 0;
+  });
+
+  currentStudents = list;
+  renderTable();
+}
+
+// ── TABLE ──
+function renderTable() {
+  const tbody = document.getElementById('studentTbody');
+  if (!tbody) return;
+  if (currentStudents.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><span class="ei">🔍</span>No students found</div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = '';
+  currentStudents.forEach((s, i) => {
+    const hasRank    = parseInt(s.rank) > 0;
+    const isSelected = String(s.selected).toUpperCase() === 'TRUE';
+    const tr         = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input type="checkbox" class="cb-selected row-cb" data-i="${i}" onchange="updateBulkInfo()"></td>
+      <td class="scholar-cell">${s.scholarNo}</td>
+      <td>${s.name}</td>
+      <td>${s.class || '—'}</td>
+      <td>
+        <button class="btn-select-toggle ${isSelected ? 'yes' : 'no'}"
+          id="selbtn_${s.scholarNo}"
+          data-scholar="${s.scholarNo}"
+          data-selected="${isSelected}"
+          onclick="toggleSelected(this)">
+          ${isSelected ? '✓ Selected' : '+ Select'}
+        </button>
+      </td>
+      <td>
+        <input class="marks-input" type="number" min="0" max="10" step="0.1"
+          value="${parseFloat(s.marks) || ''}" placeholder="0–10"
+          data-scholar="${s.scholarNo}"
+          onblur="saveMarks(this)"
+          onkeydown="if(event.key==='Enter'){this.blur();}">
+        <span class="saving-dot" id="dot_${s.scholarNo}" style="display:none;margin-left:6px;"></span>
+      </td>
+      <td class="rank-cell">${hasRank ? `<span class="rank-badge">#${s.rank}</span>` : '<span class="rank-none">—</span>'}</td>
+      <td>
+        <input class="team-input" type="text" value="${s.teamName||''}" placeholder="Team name"
+          data-scholar="${s.scholarNo}"
+          onblur="saveTeam(this)"
+          onkeydown="if(event.key==='Enter'){this.blur();}">
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+  updateBulkInfo();
+}
+
+// ── MARKS SAVE ──
+async function saveMarks(input) {
+  const scholar = input.getAttribute('data-scholar');
+  const val     = parseFloat(input.value);
+  if (isNaN(val) || val < 0 || val > 10) { showToast('Marks must be 0–10', 'error'); return; }
+
+  const dot = document.getElementById('dot_' + scholar);
+  if (dot) dot.style.display = 'inline-block';
+
+  const res = await nocorsAction({
+    path: 'admin/marks', password: ADMIN_PASS,
+    eventName: currentEvent, scholarNo: scholar, marks: val
+  });
+
+  if (dot) dot.style.display = 'none';
+
+  if (res && res.success) {
+    const student = allStudents.find(s => String(s.scholarNo) === String(scholar));
+    if (student) student.marks = val;
+    showToast('Marks saved', 'success');
+    updateStats();
+  } else {
+    showToast('Failed to save marks', 'error');
+  }
+}
+
+// ── TEAM SAVE ──
+async function saveTeam(input) {
+  const scholar = input.getAttribute('data-scholar');
+  const val     = input.value.trim();
+
+  const res = await nocorsAction({
+    path: 'admin/teamname', password: ADMIN_PASS,
+    eventName: currentEvent, scholarNo: scholar, teamName: val
+  });
+
+  if (res && res.success) {
+    const student = allStudents.find(s => String(s.scholarNo) === String(scholar));
+    if (student) student.teamName = val;
+    showToast('Team name saved', 'success');
+  } else {
+    showToast('Failed to save team name', 'error');
+  }
+}
+
+// ── TOGGLE SELECTED ──
+async function toggleSelected(btn) {
+  const scholar    = btn.getAttribute('data-scholar');
+  const currentVal = btn.getAttribute('data-selected') === 'true';
+  const newVal     = !currentVal;
+
+  btn.disabled    = true;
+  btn.textContent = 'Saving...';
+
+  const res = await nocorsAction({
+    path: 'admin/selected', password: ADMIN_PASS,
+    eventName: currentEvent, scholarNo: scholar, selected: newVal
+  });
+
+  btn.disabled = false;
+  if (res && res.success) {
+    const student = allStudents.find(s => String(s.scholarNo) === String(scholar));
+    if (student) student.selected = newVal ? 'TRUE' : 'FALSE';
+    btn.setAttribute('data-selected', String(newVal));
+    btn.className   = `btn-select-toggle ${newVal ? 'yes' : 'no'}`;
+    btn.textContent = newVal ? '✓ Selected' : '+ Select';
+    showToast(newVal ? `${scholar} marked selected` : `${scholar} deselected`, 'success');
+    updateStats();
+  } else {
+    btn.textContent = currentVal ? '✓ Selected' : '+ Select';
+    showToast('Failed to update selection', 'error');
+  }
+}
+
+// ── STATS ──
+function updateStats() {
+  const s = allStudents;
+  const el = (id) => document.getElementById(id);
+  if (el('statTotal'))    el('statTotal').textContent    = s.length;
+  if (el('statMarked'))   el('statMarked').textContent   = s.filter(x => parseFloat(x.marks) > 0).length;
+  if (el('statPending'))  el('statPending').textContent  = s.filter(x => !(parseFloat(x.marks) > 0)).length;
+  if (el('statSelected')) el('statSelected').textContent = s.filter(x => String(x.selected).toUpperCase() === 'TRUE').length;
+}
+
+// ── BULK ──
+function updateBulkInfo() {
+  const cbs  = document.querySelectorAll('.row-cb:checked');
+  const info = document.getElementById('bulkInfo');
+  if (info) info.textContent = `${cbs.length} selected`;
+}
+
+function selectAll(val) {
+  document.querySelectorAll('.row-cb').forEach(cb => cb.checked = val);
+  const master = document.getElementById('masterCb');
+  if (master) master.checked = val;
+  updateBulkInfo();
+}
+
+function masterCheck(cb) {
+  document.querySelectorAll('.row-cb').forEach(r => r.checked = cb.checked);
+  updateBulkInfo();
+}
+
+function getSelectedScholars() {
+  return Array.from(document.querySelectorAll('.row-cb:checked'))
+    .map(cb => currentStudents[parseInt(cb.getAttribute('data-i'))]?.scholarNo)
+    .filter(Boolean);
+}
+
+// ── MARK MODAL ──
+function openMarkModal() {
+  const sel = getSelectedScholars();
+  if (sel.length === 0) { showToast('Select at least one student', 'error'); return; }
+  document.getElementById('markModalBody').textContent = `Apply marks to ${sel.length} selected student(s).`;
+  document.getElementById('markModalInput').value = '';
+  openModal('markModal');
+}
+
+// Single batch call — one request for all selected students
+async function applyBulkMarks() {
+  const val = parseFloat(document.getElementById('markModalInput').value);
+  if (isNaN(val) || val < 0 || val > 10) { showToast('Invalid marks (0–10)', 'error'); return; }
+  const scholars = getSelectedScholars();
+  closeModal('markModal');
+
+  const res = await nocorsAction({
+    path: 'admin/marks/batch', password: ADMIN_PASS,
+    eventName: currentEvent,
+    scholarNos: scholars.join(','),
+    marks: val
+  });
+
+  if (res && res.success) {
+    scholars.forEach(scholar => {
+      const s = allStudents.find(st => String(st.scholarNo) === String(scholar));
+      if (s) s.marks = val;
+    });
+    showToast(`Saved marks for ${res.updated}/${scholars.length} students`, 'success');
+    applyFilter();
+    updateStats();
+  } else {
+    showToast('Failed to save marks', 'error');
+  }
+}
+
+// ── DELETE / REMOVE ──
+function openDeleteModal() {
+  const sel = getSelectedScholars();
+  if (sel.length === 0) { showToast('Select at least one student', 'error'); return; }
+  document.getElementById('deleteModalBody').textContent = `Remove ${sel.length} student(s) from the local view of ${currentEvent}?`;
+  openModal('deleteModal');
+}
+
+function confirmDelete() {
+  const scholars = getSelectedScholars();
+  allStudents = allStudents.filter(s => !scholars.includes(String(s.scholarNo)));
+  allEvents[currentEvent] = allStudents;
+  closeModal('deleteModal');
+  showToast(`Removed ${scholars.length} student(s) from view`, 'success');
+  renderRightPanel();
+}
+
+// ── AUTO RANK ──
+// Only refreshes the current event after ranking — not all 20
+async function doAutoRank() {
+  closeModal('rankModal');
+  const res = await nocorsAction({
+    path: 'admin/auto-rank', password: ADMIN_PASS,
+    eventName: currentEvent
+  });
+  if (res && res.success) {
+    showToast(`Ranked ${res.ranked || ''} students! Refreshing...`, 'success');
+    await refreshCurrentEvent();
+  } else {
+    showToast('Auto-rank failed', 'error');
+  }
+}
+
+// ── CSV EXPORT ──
+function exportCSV() {
+  if (!allStudents.length) { showToast('No data to export', 'error'); return; }
+  const headers = ['Scholar Number','Name','Class','Selected','Marks','Rank','Team Name'];
+  const rows = allStudents.map(s => [
+    `"${s.scholarNo}"`, `"${s.name}"`, `"${s.class||''}"`,
+    `"${s.selected||false}"`, `"${s.marks||0}"`, `"${s.rank||0}"`, `"${s.teamName||''}"`
+  ]);
+  const csv  = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `${currentEvent}_Results_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('CSV exported!', 'success');
+}
+
+// ── MODAL HELPERS ──
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m =>
+  m.addEventListener('click', e => { if(e.target === m) m.classList.remove('open'); })
+);
+
+// ── MOBILE ──
+function toggleMobilePanel() {
+  const panel = document.querySelector('.left-panel');
+  const btn   = document.getElementById('mobilePanelToggle');
+  if (!panel) return;
+  panel.classList.toggle('open');
+  btn.textContent = panel.classList.contains('open') ? '✕' : '☰';
+}
+
+// ── TOAST ──
+function showToast(msg, type = 'success') {
+  const c = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<span>${type==='success'?'✓':'✗'}</span><span>${msg}</span>`;
+  c.appendChild(t);
+  setTimeout(() => { t.style.animation = 'slideDown 0.3s ease forwards'; setTimeout(() => t.remove(), 300); }, 3000);
+}
+</script>
+</body>
+</html>

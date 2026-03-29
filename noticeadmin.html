@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Notice Admin — TechQuest 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#03050f;--surface:#080d1e;--surface2:#0d1530;
+      --blue:#4f6fff;--blue-dim:rgba(79,111,255,.1);--blue-bdr:rgba(79,111,255,.25);
+      --cyan:#29d4e0;--gold:#e8b84b;--gold-dim:rgba(232,184,75,.1);--gold-bdr:rgba(232,184,75,.22);
+      --green:#3dd68c;--green-dim:rgba(61,214,140,.1);--green-bdr:rgba(61,214,140,.25);
+      --red:#e05c6b;--red-dim:rgba(224,92,107,.1);--red-bdr:rgba(224,92,107,.25);
+      --text:#c8ddf0;--muted:#4a6080;--border:rgba(79,111,255,.12);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.6;min-height:100vh}
+
+    /* ── NAV ── */
+    nav{position:fixed;top:0;left:0;right:0;height:56px;background:rgba(3,5,15,.95);border-bottom:1px solid var(--border);backdrop-filter:blur(18px);display:flex;align-items:center;justify-content:space-between;padding:0 5vw;z-index:100}
+    .nav-logo{font-family:'IBM Plex Mono',monospace;font-size:.88em;font-weight:700;letter-spacing:2px;color:#fff;text-decoration:none}
+    .nav-logo span{color:var(--gold)}
+    .nav-right{display:flex;align-items:center;gap:10px}
+    .nav-link{font-family:'IBM Plex Mono',monospace;font-size:.65em;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);border:1px solid var(--border);padding:5px 12px;text-decoration:none;transition:all .2s}
+    .nav-link:hover{color:var(--text);border-color:var(--blue-bdr);background:var(--blue-dim)}
+    .nav-tag{font-family:'IBM Plex Mono',monospace;font-size:.6em;letter-spacing:1px;text-transform:uppercase;padding:3px 10px;background:var(--gold-dim);color:var(--gold);border:1px solid var(--gold-bdr);border-radius:2px}
+
+    /* ── PASSWORD GATE ── */
+    #gateScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(ellipse at 50% 0%,rgba(232,184,75,.06) 0%,transparent 60%)}
+    .gate-card{width:100%;max-width:380px;background:var(--surface);border:1px solid var(--gold-bdr);padding:40px 36px;box-shadow:0 0 60px rgba(232,184,75,.1)}
+    .gate-eyebrow{font-family:'IBM Plex Mono',monospace;font-size:.6em;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:1.2em;opacity:.7}
+    .gate-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.6em;color:#fff;margin-bottom:1.8em}
+    .field-label{font-family:'IBM Plex Mono',monospace;font-size:.6em;letter-spacing:2px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px}
+    .field-input,.field-select,.field-textarea{width:100%;background:var(--surface2);border:1px solid var(--border);padding:11px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.9em;outline:none;transition:border .2s;border-radius:0}
+    .field-input:focus,.field-select:focus,.field-textarea:focus{border-color:var(--gold);box-shadow:0 0 0 2px rgba(232,184,75,.1)}
+    .field-textarea{resize:vertical;min-height:140px;line-height:1.75;font-family:'DM Sans',sans-serif}
+    .field-select{cursor:pointer}.field-select option{background:var(--surface2)}
+    .field-hint{font-size:.7em;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-top:5px}
+    .btn-primary{width:100%;font-family:'IBM Plex Mono',monospace;font-size:.72em;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:13px;background:var(--gold);color:#03050f;border:none;cursor:pointer;transition:all .2s;margin-top:8px}
+    .btn-primary:hover{background:#f0ca6e;box-shadow:0 0 20px rgba(232,184,75,.35)}
+    .btn-primary:disabled{opacity:.5;cursor:not-allowed}
+    .gate-error{font-size:.75em;color:var(--red);margin-top:10px;text-align:center;font-family:'IBM Plex Mono',monospace;display:none}
+
+    /* ── MAIN LAYOUT ── */
+    #mainScreen{display:none;padding-top:56px;min-height:100vh}
+    .layout{display:grid;grid-template-columns:420px 1fr;min-height:calc(100vh - 56px)}
+    @media(max-width:900px){.layout{grid-template-columns:1fr}}
+
+    /* ── LEFT PANEL — FORM ── */
+    .form-panel{border-right:1px solid var(--border);padding:2em 2.2em;background:var(--surface);overflow-y:auto;position:sticky;top:56px;height:calc(100vh - 56px)}
+    .panel-title{font-family:'IBM Plex Mono',monospace;font-size:.68em;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);margin-bottom:1.6em;padding-bottom:.8em;border-bottom:1px solid var(--border)}
+    .form-stack{display:flex;flex-direction:column;gap:14px}
+    .field-group{display:flex;flex-direction:column;gap:5px}
+    .check-row{display:flex;align-items:center;gap:10px;cursor:pointer;padding:.4em 0}
+    .check-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--gold);cursor:pointer;flex-shrink:0}
+    .check-row span{font-size:.84em;color:var(--text)}
+    .btn-secondary{font-family:'IBM Plex Mono',monospace;font-size:.68em;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;padding:10px;background:transparent;color:var(--muted);border:1px solid var(--border);cursor:pointer;transition:all .2s;width:100%}
+    .btn-secondary:hover{border-color:var(--red-bdr);color:var(--red)}
+    .form-status{font-family:'IBM Plex Mono',monospace;font-size:.68em;text-align:center;padding:8px 12px;border-radius:2px;display:none}
+    .form-status.ok{background:var(--green-dim);color:var(--green);border:1px solid var(--green-bdr)}
+    .form-status.err{background:var(--red-dim);color:var(--red);border:1px solid var(--red-bdr)}
+    .edit-banner{background:rgba(232,184,75,.07);border:1px solid var(--gold-bdr);padding:.7em 1em;font-family:'IBM Plex Mono',monospace;font-size:.65em;color:var(--gold);letter-spacing:.5px;display:none}
+
+    /* ── RIGHT PANEL — MANAGE ── */
+    .manage-panel{padding:2em 2.2em;overflow-y:auto}
+    .manage-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.4em;padding-bottom:.8em;border-bottom:1px solid var(--border)}
+    .manage-title{font-family:'IBM Plex Mono',monospace;font-size:.68em;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted)}
+    .notice-count{font-family:'IBM Plex Mono',monospace;font-size:.62em;color:var(--muted)}
+    .notices-stack{display:flex;flex-direction:column;gap:8px}
+    .admin-card{background:var(--surface2);border:1px solid var(--border);border-left:3px solid var(--blue);padding:1em 1.2em}
+    .admin-card.ac-gold{border-left-color:var(--gold)}
+    .ac-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:.4em}
+    .ac-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.9em;color:#fff;flex:1;line-height:1.3}
+    .ac-actions{display:flex;gap:5px;flex-shrink:0}
+    .btn-edit,.btn-del{font-family:'IBM Plex Mono',monospace;font-size:.58em;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border:1px solid;cursor:pointer;transition:all .2s;background:none}
+    .btn-edit{color:var(--blue);border-color:var(--blue-bdr)}.btn-edit:hover{background:var(--blue-dim)}
+    .btn-del{color:var(--red);border-color:var(--red-bdr)}.btn-del:hover{background:var(--red-dim)}
+    .ac-meta{font-family:'IBM Plex Mono',monospace;font-size:.6em;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
+    .ac-imp{color:var(--gold)}
+    .ac-body-preview{font-size:.8em;color:var(--muted);margin-top:.4em;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+    .empty-state{padding:3em 2em;text-align:center;color:var(--muted);font-size:.8em;border:1px dashed var(--border);font-family:'IBM Plex Mono',monospace;letter-spacing:1px}
+    .spinner-wrap{display:flex;justify-content:center;padding:3em}
+    .spinner{width:26px;height:26px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* ── TOAST ── */
+    #toastContainer{position:fixed;bottom:24px;right:24px;z-index:9000;display:flex;flex-direction:column;gap:8px}
+    .toast{background:var(--surface);border-radius:2px;padding:10px 16px;font-size:.75em;font-family:'IBM Plex Mono',monospace;display:flex;align-items:center;gap:10px;min-width:200px;box-shadow:0 4px 20px rgba(0,0,0,.4);animation:tin .25s ease}
+    .toast.ok{border:1px solid var(--green-bdr);color:var(--green)}
+    .toast.err{border:1px solid var(--red-bdr);color:var(--red)}
+    @keyframes tin{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+    @media(max-width:900px){
+      .form-panel{position:static;height:auto;border-right:none;border-bottom:1px solid var(--border)}
+      .layout{display:flex;flex-direction:column}
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="notice.html" class="nav-logo">Tech<span>Quest</span> — Notices</a>
+  <div class="nav-right">
+    <span class="nav-tag">Admin</span>
+    <a href="notice.html" class="nav-link">View Public</a>
+    <a href="index.html"  class="nav-link">← Home</a>
+  </div>
+</nav>
+
+<!-- PASSWORD GATE -->
+<div id="gateScreen">
+  <div class="gate-card">
+    <div class="gate-eyebrow">TechQuest 2026</div>
+    <div class="gate-title">Notice Admin</div>
+    <label class="field-label" for="gateInput">Password</label>
+    <input type="password" class="field-input" id="gateInput" placeholder="Enter password" onkeydown="if(event.key==='Enter')checkGate()">
+    <button class="btn-primary" onclick="checkGate()">Unlock</button>
+    <div class="gate-error" id="gateError">Incorrect password</div>
+  </div>
+</div>
+
+<!-- MAIN SCREEN -->
+<div id="mainScreen">
+  <div class="layout">
+
+    <!-- FORM PANEL -->
+    <div class="form-panel">
+      <div class="panel-title" id="formPanelTitle">Post a New Notice</div>
+      <div class="edit-banner" id="editBanner">✎ Editing notice — make changes and save</div>
+      <div class="form-stack">
+        <input type="hidden" id="editingId">
+
+        <div class="field-group">
+          <label class="field-label">Type</label>
+          <select class="field-select" id="fType" onchange="toggleEventField()">
+            <option value="general">General</option>
+            <option value="event">Event</option>
+          </select>
+        </div>
+
+        <div class="field-group" id="eventNameGroup" style="display:none">
+          <label class="field-label">Event Name</label>
+          <select class="field-select" id="fEventName">
+            <option value="">— Select Event —</option>
+            <option>Codezilla</option><option>Kill D' Bug</option>
+            <option>Algorithm Making</option><option>Robotics</option>
+            <option>Pivot Animation</option><option>Slide Master</option>
+            <option>PixBit</option><option>Debate</option>
+            <option>Ham the Jam</option><option>From the Scratch</option>
+            <option>Digital Playground</option><option>Animatrix</option>
+            <option>Weave the Web</option><option>Pixelated</option>
+            <option>Cinematic Cuts</option><option>Fade The Track</option>
+            <option>Frame D Flash</option><option>Tech Quiz</option>
+            <option>Do DubDUB</option><option>Scavenger Hunt</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Title / Heading</label>
+          <input type="text" class="field-input" id="fTitle" placeholder="Notice heading">
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Body</label>
+          <textarea class="field-textarea" id="fBody" placeholder="Type the notice here…&#10;&#10;Press Enter for a new line.&#10;Leave a blank line to start a new paragraph."></textarea>
+          <div class="field-hint">Enter = new line &nbsp;·&nbsp; Blank line = new paragraph</div>
+        </div>
+
+        <label class="check-row">
+          <input type="checkbox" id="fImportant">
+          <span>Mark as Important (shows in Important section)</span>
+        </label>
+
+        <div class="form-status" id="formStatus"></div>
+        <button class="btn-primary" id="submitBtn" onclick="submitNotice()">Post Notice</button>
+        <button class="btn-secondary" id="cancelEditBtn" style="display:none" onclick="cancelEdit()">Cancel Edit</button>
+      </div>
+    </div>
+
+    <!-- MANAGE PANEL -->
+    <div class="manage-panel">
+      <div class="manage-header">
+        <div class="manage-title">All Notices</div>
+        <div class="notice-count" id="noticeCount">Loading…</div>
+      </div>
+      <div id="manageList"><div class="spinner-wrap"><div class="spinner"></div></div></div>
+    </div>
+
+  </div>
+</div>
+
+<div id="toastContainer"></div>
+
+<script>
+const API_URL='https://script.google.com/macros/s/AKfycbxd8e8AStR2au6eOUBB0NmeDESGMNjyDLLvu2HZmybr-TsjOM0jilZ6jDuOpIbIqcG5/exec';
+const PASS='tq26';
+let allNotices=[];
+
+// ── JSONP ──
+function fetchJSONP(url){
+  return new Promise((res,rej)=>{
+    const cb='_tqa_'+Math.random().toString(36).slice(2);
+    const s=document.createElement('script');
+    s.src=url+(url.includes('?')?'&':'?')+'callback='+cb;
+    s.onerror=()=>{delete window[cb];s.remove();rej()};
+    window[cb]=d=>{delete window[cb];s.remove();res(d)};
+    document.head.appendChild(s);
+  });
+}
+async function fetchAPI(url){
+  try{return await fetchJSONP(url);}
+  catch{try{const r=await fetch(url,{redirect:'follow'});return await r.json();}catch{return null;}}
+}
+async function writeAPI(url){
+  try{await fetch(url,{method:'GET',mode:'no-cors'});}catch{}
+}
+
+// ── GATE ──
+function checkGate(){
+  const v=document.getElementById('gateInput').value;
+  if(v===PASS){
+    document.getElementById('gateScreen').style.display='none';
+    document.getElementById('mainScreen').style.display='block';
+    loadNotices();
+  }else{
+    const e=document.getElementById('gateError');
+    e.style.display='block';e.textContent='Incorrect password';
+    document.getElementById('gateInput').value='';
+    document.getElementById('gateInput').focus();
+  }
+}
+document.getElementById('gateInput').addEventListener('keydown',e=>{if(e.key==='Enter')checkGate();});
+// auto-focus on load
+window.addEventListener('load',()=>document.getElementById('gateInput').focus());
+
+function toggleEventField(){
+  document.getElementById('eventNameGroup').style.display=
+    document.getElementById('fType').value==='event'?'':'none';
+}
+
+// ── LOAD ──
+async function loadNotices(){
+  const data=await fetchAPI(`${API_URL}?path=notices`);
+  allNotices=Array.isArray(data)?data:[];
+  renderManage();
+}
+
+// ── RENDER MANAGE ──
+function renderManage(){
+  const el=document.getElementById('manageList');
+  document.getElementById('noticeCount').textContent=allNotices.length+' notice'+(allNotices.length!==1?'s':'');
+  if(!allNotices.length){el.innerHTML='<div class="empty-state">No notices yet. Post one using the form.</div>';return;}
+  el.innerHTML='<div class="notices-stack">'+allNotices.map(n=>`
+    <div class="admin-card ${n.important?'ac-gold':''}">
+      <div class="ac-top">
+        <div class="ac-title">${esc(n.title)}</div>
+        <div class="ac-actions">
+          <button class="btn-edit" onclick="startEdit('${esc(n.id)}')">Edit</button>
+          <button class="btn-del"  onclick="deleteNotice('${esc(n.id)}')">Delete</button>
+        </div>
+      </div>
+      <div class="ac-body-preview">${esc(n.body.replace(/\n/g,' '))}</div>
+      <div class="ac-meta" style="margin-top:.5em">
+        <span>${n.type==='event'?'🎯 '+esc(n.eventName||''):'📋 General'}</span>
+        ${n.important?'<span class="ac-imp">⚑ Important</span>':''}
+        <span>${formatTime(n.timestamp)}</span>
+      </div>
+    </div>
+  `).join('')+'</div>';
+}
+
+function formatTime(ts){
+  if(!ts)return'';
+  const d=new Date(ts);
+  return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})+' · '+d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// ── SUBMIT ──
+async function submitNotice(){
+  const id=document.getElementById('editingId').value;
+  const type=document.getElementById('fType').value;
+  const eventName=document.getElementById('fEventName').value;
+  const title=document.getElementById('fTitle').value.trim();
+  const body=document.getElementById('fBody').value.trim();
+  const important=document.getElementById('fImportant').checked;
+  const isEdit=!!id;
+
+  if(!title||!body){showStatus('Title and body are required.',false);return;}
+  if(type==='event'&&!eventName){showStatus('Please select an event.',false);return;}
+
+  const btn=document.getElementById('submitBtn');
+  btn.disabled=true;btn.textContent=isEdit?'Saving…':'Posting…';
+
+  const qs=new URLSearchParams({
+    path:isEdit?'admin/notice/edit':'admin/notice/add',
+    password:PASS,type,eventName,title,
+    body:body.replace(/\r\n/g,'\n').replace(/\r/g,'\n'),
+    important:important?'true':'false',
+    ...(isEdit?{id}:{})
+  });
+  await writeAPI(`${API_URL}?${qs}`);
+
+  // verify with retries
+  let verified=false;
+  for(let i=0;i<4;i++){
+    await new Promise(r=>setTimeout(r,1600));
+    const fresh=await fetchAPI(`${API_URL}?path=notices`);
+    if(Array.isArray(fresh)){
+      const found=isEdit
+        ?fresh.find(n=>n.id===id&&n.title===title)
+        :fresh.find(n=>n.title===title&&n.body.slice(0,20)===body.slice(0,20));
+      if(found){allNotices=fresh;verified=true;break;}
+    }
+  }
+
+  btn.disabled=false;
+  btn.textContent=isEdit?'Save Changes':'Post Notice';
+
+  if(verified){
+    showStatus(isEdit?'Notice updated!':'Notice posted!',true);
+    resetForm();renderManage();
+    toast(isEdit?'Updated ✓':'Posted ✓','ok');
+  }else{
+    showStatus('Saved — if not visible, refresh in a moment.',true);
+    toast('Posted — verifying…','ok');
+    setTimeout(()=>loadNotices(),3000);
+  }
+}
+
+function startEdit(id){
+  const n=allNotices.find(x=>x.id===id);if(!n)return;
+  document.getElementById('editingId').value=n.id;
+  document.getElementById('fType').value=n.type;toggleEventField();
+  document.getElementById('fEventName').value=n.eventName||'';
+  document.getElementById('fTitle').value=n.title;
+  document.getElementById('fBody').value=n.body;
+  document.getElementById('fImportant').checked=n.important;
+  document.getElementById('submitBtn').textContent='Save Changes';
+  document.getElementById('cancelEditBtn').style.display='';
+  document.getElementById('editBanner').style.display='block';
+  document.getElementById('formPanelTitle').textContent='Edit Notice';
+  document.getElementById('formStatus').style.display='none';
+  // scroll form into view on mobile
+  document.querySelector('.form-panel').scrollIntoView({behavior:'smooth'});
+}
+
+function cancelEdit(){resetForm();}
+
+function resetForm(){
+  document.getElementById('editingId').value='';
+  document.getElementById('fType').value='general';toggleEventField();
+  document.getElementById('fEventName').value='';
+  document.getElementById('fTitle').value='';
+  document.getElementById('fBody').value='';
+  document.getElementById('fImportant').checked=false;
+  document.getElementById('submitBtn').textContent='Post Notice';
+  document.getElementById('cancelEditBtn').style.display='none';
+  document.getElementById('editBanner').style.display='none';
+  document.getElementById('formPanelTitle').textContent='Post a New Notice';
+  document.getElementById('formStatus').style.display='none';
+}
+
+async function deleteNotice(id){
+  if(!confirm('Delete this notice? This cannot be undone.'))return;
+  const qs=new URLSearchParams({path:'admin/notice/delete',password:PASS,id});
+  await writeAPI(`${API_URL}?${qs}`);
+  allNotices=allNotices.filter(n=>n.id!==id);
+  renderManage();toast('Deleted','ok');
+  setTimeout(async()=>{
+    const fresh=await fetchAPI(`${API_URL}?path=notices`);
+    if(Array.isArray(fresh)){allNotices=fresh;renderManage();}
+  },3000);
+}
+
+function showStatus(msg,ok){
+  const el=document.getElementById('formStatus');
+  el.textContent=msg;el.className='form-status '+(ok?'ok':'err');el.style.display='block';
+}
+
+function toast(msg,type='ok'){
+  const c=document.getElementById('toastContainer');
+  const t=document.createElement('div');
+  t.className=`toast ${type}`;
+  t.innerHTML=`<span>${type==='ok'?'✓':'✗'}</span><span>${msg}</span>`;
+  c.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(12px)';t.style.transition='all .25s';setTimeout(()=>t.remove(),260);},3000);
+}
+</script>
+</body>
+</html>
