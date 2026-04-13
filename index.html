@@ -695,6 +695,18 @@
       animation: ndotPulse 1.8s ease-in-out infinite;
     }
     .btn-notice:hover .ndot { background: #03050f; animation: none; }
+    /* Timetable button — cyan variant of btn-notice */
+    .btn-tt {
+      color: var(--cyan) !important;
+      border-color: rgba(0,210,255,.28) !important;
+      background: rgba(0,210,255,.08) !important;
+    }
+    .btn-tt:hover {
+      background: var(--cyan) !important;
+      color: #03050f !important;
+      border-color: var(--cyan) !important;
+      box-shadow: 0 0 24px rgba(0,210,255,.4) !important;
+    }
     @keyframes ndotPulse {
       0%,100%{ opacity:1; transform:scale(1); }
       50%    { opacity:.3; transform:scale(.55); }
@@ -953,6 +965,7 @@
     <div class="title-rule"></div>
     <div class="btn-notice-row">
       <a href="notice.html" class="btn-notice"><span class="ndot"></span>Notices &amp; Updates</a>
+      <a href="tt.pdf" target="_blank" rel="noopener" class="btn-notice btn-tt"><span class="ndot" style="background:var(--cyan)"></span>Event Timetable</a>
       <a href="https://youtube.com/@techquestvsec?si=qDkZiFHJCs8OJqpC" target="_blank" rel="noopener" class="btn-yt"><span class="yt-icon">▶</span>Help &amp; Tutorial Videos</a>
     </div>
     <div class="filter-bar" id="filterBar">
