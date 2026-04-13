@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Ad Break — TechQuest</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:#F5F4F0; --surface:#FFFFFF; --navy:#12213A; --navy-mid:#1E3355;
+      --gold:#B5862A; --gold-lt:#D4A843; --muted:#6B7280; --border:#DDD9D2;
+      --text:#1C1C2E; --subtext:#6E6E82; --phase1:#1E6B9A; --phase2:#2E7D62;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{overflow-x:hidden;}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;width:100%;}
+
+    .topband{background:var(--navy);padding:13px 40px;display:flex;align-items:center;justify-content:space-between;}
+    .topband-logo{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;letter-spacing:1px;}
+    .topband-logo span{color:var(--gold-lt);}
+    .topband-tag{font-size:10px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.3);}
+
+    .hero{background:var(--navy);padding:52px 40px 60px;position:relative;overflow:hidden;}
+    .hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--gold),#E8C06A,var(--gold));}
+    .hero-eyebrow{font-size:10px;font-weight:500;letter-spacing:4px;text-transform:uppercase;color:var(--gold-lt);margin-bottom:16px;}
+    .hero-title{font-family:'Playfair Display',serif;font-size:clamp(52px,10vw,104px);font-weight:900;line-height:0.9;color:#fff;letter-spacing:-1px;}
+    .hero-title em{font-style:italic;font-weight:400;color:var(--gold-lt);}
+    .hero-sub{margin-top:20px;font-size:16px;font-weight:300;color:rgba(255,255,255,0.42);max-width:440px;line-height:1.75;}
+    .hero-pills{display:flex;gap:9px;flex-wrap:wrap;margin-top:28px;}
+    .hero-pill{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.11);border-radius:3px;padding:5px 13px;font-size:11px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.45);}
+    .hero-pill.hl{background:rgba(181,134,42,0.14);border-color:rgba(181,134,42,0.38);color:var(--gold-lt);}
+
+    .spotlight-banner{background:linear-gradient(135deg,#B5862A 0%,#E8C06A 50%,#B5862A 100%);padding:18px 40px;display:flex;align-items:center;gap:16px;}
+    .spotlight-icon{font-size:22px;flex-shrink:0;}
+    .spotlight-title-sm{font-size:13px;font-weight:600;color:#12213A;letter-spacing:0.5px;margin-bottom:2px;}
+    .spotlight-sub-sm{font-size:12px;font-weight:300;color:rgba(18,33,58,0.65);line-height:1.5;}
+
+    .tab-wrap{background:var(--surface);border-bottom:1px solid var(--border);padding:0 40px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,0.06);overflow-x:auto;-webkit-overflow-scrolling:touch;}
+    .tabs{display:flex;max-width:820px;margin:0 auto;min-width:max-content;}
+    .tab-btn{background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;letter-spacing:2px;text-transform:uppercase;padding:17px 20px;color:var(--muted);position:relative;transition:color 0.25s;white-space:nowrap;}
+    .tab-btn::after{content:'';position:absolute;bottom:0;left:20px;right:20px;height:2px;background:var(--navy);transform:scaleX(0);transition:transform 0.25s;}
+    .tab-btn.active{color:var(--navy);}
+    .tab-btn.active::after{transform:scaleX(1);}
+    .tab-btn:hover{color:var(--navy);}
+
+    .content{max-width:820px;margin:0 auto;padding:44px 40px 80px;}
+    .panel{display:none;animation:fadeUp 0.35s ease;}
+    .panel.active{display:block;}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+
+    .about-lead{font-family:'Playfair Display',serif;font-size:20px;font-weight:400;font-style:italic;color:var(--navy-mid);line-height:1.75;border-left:3px solid var(--gold);padding-left:22px;margin-bottom:32px;}
+    .about-body{font-size:15px;font-weight:300;line-height:1.9;color:#4A4A5A;margin-bottom:36px;}
+    .about-body strong{font-weight:500;color:var(--navy);}
+
+    .phase-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:36px;}
+    .phase-card{border-radius:8px;padding:24px;border:1px solid var(--border);background:var(--surface);position:relative;overflow:hidden;}
+    .phase-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--ph);}
+    .phase-num{font-size:10px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--ph);margin-bottom:10px;}
+    .phase-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--navy);margin-bottom:6px;}
+    .phase-marks-badge{display:inline-block;background:var(--ph);color:#fff;font-size:11px;font-weight:600;letter-spacing:1px;padding:3px 10px;border-radius:20px;margin-bottom:12px;}
+    .phase-desc{font-size:13px;font-weight:300;color:var(--subtext);line-height:1.7;}
+
+    .section-label{font-size:10px;font-weight:500;letter-spacing:4px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;}
+
+    .product-grid{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px;}
+    .product-chip{border:1px solid var(--border);border-radius:3px;padding:8px 16px;font-family:'Playfair Display',serif;font-style:italic;font-size:14px;cursor:pointer;background:var(--surface);color:var(--subtext);transition:all 0.2s;}
+    .product-chip:hover,.product-chip.flipped{border-color:var(--gold);color:var(--gold);background:rgba(181,134,42,0.04);}
+    .product-hint{font-size:12px;color:#BBBAB5;}
+
+    .details-table{background:var(--surface);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:18px;}
+    .detail-row{display:flex;justify-content:space-between;align-items:center;padding:15px 22px;border-bottom:1px solid var(--border);transition:background 0.15s;}
+    .detail-row:last-child{border-bottom:none;}
+    .detail-row:hover{background:#FAFAF8;}
+    .detail-label{font-size:10px;font-weight:500;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);}
+    .detail-value{font-size:14px;font-weight:400;color:var(--navy);text-align:right;}
+
+    .info-box{background:rgba(18,33,58,0.03);border:1px solid rgba(18,33,58,0.09);border-left:3px solid var(--navy);border-radius:4px;padding:16px 20px;margin-bottom:12px;}
+    .info-box p{font-size:13.5px;font-weight:300;color:var(--navy-mid);line-height:1.8;}
+    .info-box.gold-box{background:rgba(181,134,42,0.05);border-color:rgba(181,134,42,0.3);border-left-color:var(--gold);}
+    .info-box.gold-box p{color:#7A5A1A;}
+
+    .phase-section-header{display:flex;align-items:center;gap:12px;margin-bottom:14px;margin-top:32px;}
+    .phase-section-header:first-child{margin-top:0;}
+    .psh-line{flex:1;height:1px;background:var(--border);}
+    .psh-label{font-size:10px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--ph);white-space:nowrap;}
+    .psh-total{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--ph);}
+
+    .criteria-list{display:flex;flex-direction:column;gap:8px;margin-bottom:8px;}
+    .criteria-card{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:16px 20px;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden;}
+    .criteria-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--acc);opacity:0;transition:opacity 0.2s;}
+    .criteria-card:hover,.criteria-card.open{border-color:var(--acc);box-shadow:0 2px 14px rgba(0,0,0,0.06);}
+    .criteria-card:hover::before,.criteria-card.open::before{opacity:1;}
+    .criteria-top{display:flex;justify-content:space-between;align-items:center;}
+    .criteria-name{font-size:14px;font-weight:500;color:var(--navy);margin-bottom:5px;}
+    .criteria-bar-bg{width:120px;height:3px;background:#ECEAE5;border-radius:2px;overflow:hidden;}
+    .criteria-bar-fill{height:100%;border-radius:2px;background:var(--acc);opacity:0.6;}
+    .criteria-marks{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--acc);min-width:40px;text-align:right;}
+    .criteria-desc{font-size:12.5px;font-weight:300;color:var(--subtext);margin-top:10px;line-height:1.75;display:none;animation:fadeUp 0.2s ease;}
+    .criteria-card.open .criteria-desc{display:block;}
+
+    .total-line{display:flex;justify-content:space-between;align-items:center;padding:18px 24px;background:var(--navy);border-radius:6px;margin:28px 0 24px;}
+    .total-line-label{font-size:10px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.4);}
+    .total-split{font-size:12px;font-weight:300;color:rgba(255,255,255,0.28);margin-top:3px;}
+    .total-line-num{font-family:'Playfair Display',serif;font-size:36px;font-weight:700;color:var(--gold-lt);}
+
+    .grade-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .grade-card{background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:13px 16px;display:flex;justify-content:space-between;align-items:center;transition:box-shadow 0.2s;}
+    .grade-card:hover{box-shadow:0 2px 10px rgba(0,0,0,0.07);}
+    .grade-range{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;}
+    .grade-label{font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
+
+    .spotlight-section{background:linear-gradient(135deg,#12213A 0%,#1E3355 100%);border-radius:10px;padding:32px 30px;margin-top:32px;border:1px solid rgba(181,134,42,0.25);position:relative;overflow:hidden;}
+    .spotlight-section::before{content:'★';position:absolute;right:24px;top:20px;font-size:72px;color:rgba(181,134,42,0.08);line-height:1;}
+    .ss-label{font-size:10px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:var(--gold-lt);margin-bottom:10px;}
+    .ss-title{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:#fff;margin-bottom:12px;line-height:1.2;}
+    .ss-body{font-size:14px;font-weight:300;color:rgba(255,255,255,0.5);line-height:1.8;margin-bottom:20px;}
+    .sc-item{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;}
+    .sc-item:last-child{margin-bottom:0;}
+    .sc-dot{width:5px;height:5px;border-radius:50%;background:var(--gold-lt);margin-top:7px;flex-shrink:0;}
+    .sc-text{font-size:13px;font-weight:300;color:rgba(255,255,255,0.48);line-height:1.65;}
+    .sc-text strong{font-weight:500;color:rgba(255,255,255,0.78);}
+
+    .contact-section{background:var(--surface);border-top:1px solid var(--border);padding:40px 40px 44px;}
+    .contact-inner{max-width:820px;margin:0 auto;}
+    .contact-label{font-size:10px;font-weight:500;letter-spacing:4px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+    .contact-title{font-family:"Playfair Display",serif;font-size:22px;font-weight:700;color:var(--navy);margin-bottom:6px;}
+    .contact-sub{font-size:13.5px;font-weight:300;color:var(--subtext);margin-bottom:24px;line-height:1.7;}
+    .heads-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;}
+    .head-card{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:14px 16px;transition:box-shadow 0.2s,border-color 0.2s;}
+    .head-card:hover{box-shadow:0 2px 12px rgba(0,0,0,0.07);border-color:rgba(181,134,42,0.35);}
+    .head-name{font-size:14px;font-weight:500;color:var(--navy);margin-bottom:4px;}
+    .head-class{font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--gold);}
+
+    footer{background:var(--navy);padding:20px 40px;display:flex;justify-content:space-between;align-items:center;}
+    .ft-left{font-size:11px;font-weight:400;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.2);}
+    .ft-right{font-size:11px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--gold);opacity:0.65;}
+
+    @media(max-width:600px){
+      .hero,.content,.topband,footer,.spotlight-banner,.tab-wrap,.contact-section{padding-left:18px;padding-right:18px;}
+      .heads-grid{grid-template-columns:1fr 1fr;}
+      .tab-btn{padding:15px 10px;font-size:10px;}
+      .phase-grid,.grade-grid{grid-template-columns:1fr;}
+      .hero-title{font-size:50px;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOP BAND -->
+<div class="topband">
+  <div class="topband-logo">Tech<span>Quest</span></div>
+  <div class="topband-tag">Official Event Brief</div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <p class="hero-eyebrow">TechQuest · Commerce meets Science</p>
+  <h1 class="hero-title">The Ad<br/><em>Break</em></h1>
+  <p class="hero-sub">Pick a product. Build an ad. Take the stage.</p>
+  <div class="hero-pills">
+    <div class="hero-pill hl">Classes 5 – 12</div>
+    <div class="hero-pill">Solo or Teams up to 6</div>
+    <div class="hero-pill">2 Weeks + Live Pitch Day</div>
+    <div class="hero-pill">100 Marks</div>
+  </div>
+</div>
+
+<!-- SPOTLIGHT BANNER -->
+<div class="spotlight-banner">
+  <div class="spotlight-icon">🏆</div>
+  <div>
+    <div class="spotlight-title-sm">Closing Ceremony Spotlight</div>
+    <div class="spotlight-sub-sm">The best ad video will be screened live at TechQuest's closing ceremony in front of the entire school, teachers, and guests.</div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tab-wrap">
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('about',this)">About</button>
+    <button class="tab-btn" onclick="switchTab('format',this)">Event Format</button>
+    <button class="tab-btn" onclick="switchTab('marking',this)">Marking Scheme</button>
+    <button class="tab-btn" onclick="switchTab('guidelines',this)">Guidelines</button>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- ABOUT -->
+  <div id="panel-about" class="panel active">
+    <p class="about-lead">
+      Teams choose any product they believe in — real or imagined — and have two weeks to build an ad that sells it. Then they take the stage and pitch it to the judges.
+    </p>
+    <p class="about-body">
+      <strong>The Ad Break</strong> is where Commerce stream and Science stream collide. Teams pick a product — an app, an AI tool, a clothing brand, a service, anything — and build a video advertisement around it. On event day, they screen their ad in front of a panel of teachers and the Principal, then pitch the product live and answer questions.<br/><br/>
+      The event tests two very different skills at once: the <strong>creative instinct</strong> to make something worth watching, and the <strong>strategic thinking</strong> to stand behind it and sell it. A great ad with no conviction behind it won't win. Neither will a sharp pitch with a forgettable ad.
+    </p>
+
+    <div class="phase-grid">
+      <div class="phase-card" style="--ph:var(--phase1)">
+        <div class="phase-num">Phase 01</div>
+        <div class="phase-title">The Ad</div>
+        <div class="phase-marks-badge">50 Marks</div>
+        <div class="phase-desc">A video ad built over two weeks for a product of the team's choice. Reviewed by event heads before the day, then screened live for the judges.</div>
+      </div>
+      <div class="phase-card" style="--ph:var(--phase2)">
+        <div class="phase-num">Phase 02</div>
+        <div class="phase-title">The Pitch</div>
+        <div class="phase-marks-badge">50 Marks</div>
+        <div class="phase-desc">Up to 5 minutes on stage — video first, then a live pitch to the judges, followed by questions. This is where confidence, clarity, and product knowledge matter.</div>
+      </div>
+    </div>
+
+    <p class="section-label">Sample Products</p>
+    <div class="product-grid">
+      <button class="product-chip" onclick="flipChip(this,0)">"An AI Study Tool"</button>
+      <button class="product-chip" onclick="flipChip(this,1)">"A Clothing Brand"</button>
+      <button class="product-chip" onclick="flipChip(this,2)">"A Food Delivery App"</button>
+      <button class="product-chip" onclick="flipChip(this,3)">"A Website Builder"</button>
+      <button class="product-chip" onclick="flipChip(this,4)">"A Fitness Tracker"</button>
+      <button class="product-chip" onclick="flipChip(this,5)">"An Eco Product"</button>
+    </div>
+    <p class="product-hint">↑ Click a product to see what a great ad might look like.</p>
+  </div>
+
+  <!-- FORMAT -->
+  <div id="panel-format" class="panel">
+    <div style="margin-bottom:32px">
+      <div class="phase-section-header" style="--ph:var(--phase1)">
+        <span class="psh-label" style="color:var(--phase1)">Phase 01 · The Ad &nbsp;—&nbsp; 2 Weeks</span>
+        <div class="psh-line"></div>
+      </div>
+      <div class="details-table">
+        <div class="detail-row"><span class="detail-label">Timeline</span><span class="detail-value">2 weeks from announcement</span></div>
+        <div class="detail-row"><span class="detail-label">Product Choice</span><span class="detail-value">Team's own — anything goes</span></div>
+        <div class="detail-row"><span class="detail-label">Video</span><span class="detail-value">Mandatory — all formats accepted</span></div>
+        <div class="detail-row"><span class="detail-label">Live Skit</span><span class="detail-value">Optional addition on event day</span></div>
+        <div class="detail-row"><span class="detail-label">Inspection</span><span class="detail-value">Event heads review before the day</span></div>
+        <div class="detail-row"><span class="detail-label">Team Size</span><span class="detail-value">Solo or teams of up to 6</span></div>
+      </div>
+      <div class="info-box">
+        <p>Teams are informed of the event and given two weeks to choose their product, plan their campaign, and produce their ad. There are no restrictions on the type of product, the production style, or the tools used. A video is required — but beyond that, creative decisions are entirely the team's own.</p>
+      </div>
+    </div>
+
+    <div>
+      <div class="phase-section-header" style="--ph:var(--phase2)">
+        <span class="psh-label" style="color:var(--phase2)">Phase 02 · Live Pitch Day &nbsp;—&nbsp; Up to 5 Minutes</span>
+        <div class="psh-line"></div>
+      </div>
+      <div class="details-table">
+        <div class="detail-row"><span class="detail-label">Total Stage Time</span><span class="detail-value">Up to 5 minutes per team</span></div>
+        <div class="detail-row"><span class="detail-label">Part A — The Ad</span><span class="detail-value">Video screened for judges</span></div>
+        <div class="detail-row"><span class="detail-label">Part B — The Pitch</span><span class="detail-value">Live presentation + Q&amp;A</span></div>
+        <div class="detail-row"><span class="detail-label">Judges</span><span class="detail-value">Teachers &amp; Principal</span></div>
+      </div>
+
+      <div class="info-box" style="margin-bottom:12px">
+        <p><strong style="color:var(--navy);font-weight:500">Part A — The Ad:</strong> The team's video is screened in front of the judges and the audience. This is the creative centrepiece of the event — the ad must stand on its own. If the team has prepared a live skit or performance to accompany it, they can present that here too, within the 5-minute window.</p>
+      </div>
+
+      <div class="info-box" style="margin-bottom:12px">
+        <p><strong style="color:var(--navy);font-weight:500">Part B — The Pitch:</strong> After the ad, the team pitches their product directly to the judges. This is not a rehearsed monologue — it is a live conversation. Judges will ask questions about the product, the choices made, the target audience, and the thinking behind the campaign. Teams must know their product and be ready to defend it.</p>
+      </div>
+
+      <div class="info-box gold-box">
+        <p>✦ &nbsp; The ad is inspected by event heads before the day, but judges evaluate the final live experience — both the video and the pitch together. A polished ad and a confident pitch are both needed to score well.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MARKING -->
+  <div id="panel-marking" class="panel">
+
+    <div class="phase-section-header" style="--ph:var(--phase1)">
+      <span class="psh-label" style="color:var(--phase1)">Phase 01 · The Ad</span>
+      <div class="psh-line"></div>
+      <span class="psh-total" style="color:var(--phase1)">50 pts</span>
+    </div>
+    <div class="criteria-list">
+      <div class="criteria-card" style="--acc:#1E6B9A" onclick="toggleCard(this)">
+        <div class="criteria-top">
+          <div><p class="criteria-name">Creativity &amp; Originality</p><div class="criteria-bar-bg"><div class="criteria-bar-fill" style="width:100%"></div></div></div>
+          <span class="criteria-marks">20</span>
+        </div>
+        <p class="criteria-desc">How fresh and unexpected is the campaign concept? Judges reward teams that go beyond a straightforward product demo — an original angle, a surprising narrative, or a format that no one else would have thought of. Safe and predictable ads score lower regardless of production quality.</p>
+      </div>
+      <div class="criteria-card" style="--acc:#2A6496" onclick="toggleCard(this)">
+        <div class="criteria-top">
+          <div><p class="criteria-name">Production Quality</p><div class="criteria-bar-bg"><div class="criteria-bar-fill" style="width:75%"></div></div></div>
+          <span class="criteria-marks">15</span>
+        </div>
+        <p class="criteria-desc">How well-made is the video? This covers editing, visuals, audio, pacing, and overall finish. Judges assess quality relative to age and resources — a Class 5 team with a well-edited phone video can score just as high as a Class 12 team with professional equipment. Effort and craft matter more than budget.</p>
+      </div>
+      <div class="criteria-card" style="--acc:#4A7FA5" onclick="toggleCard(this)">
+        <div class="criteria-top">
+          <div><p class="criteria-name">Relevance to Product</p><div class="criteria-bar-bg"><div class="criteria-bar-fill" style="width:50%"></div></div></div>
+          <span class="criteria-marks">10</span>
+        </div>
+        <p class="criteria-desc">Does the ad actually sell the product? A clever ad that leaves viewers confused about what's being advertised will lose marks here. The product must be clear, and the ad must make a genuine case for it — even if the approach is unconventional.</p>
+      </div>
+      <div class="criteria-card" style="--acc:#6B94B3" onclick="toggleCard(this)">
+        <div class="criteria-top">
+          <div><p class="criteria-name">Impact &amp; Memorability</p><div class="criteria-bar-bg"><div class="criteria-bar-fill" style="width:25%"></div></div></div>
+          <span class="criteria-marks">5</span>
+        </div>
+        <p class="criteria-desc">Would someone remember this ad? Does it land emotionally, make the audience laugh, think, or feel something? The best ads leave a mark. Judges note whether the ad stays with them after the screening ends.</p>
+      </div>
+    </div>
+
+    <div class="phase-section-header" style="--ph:var(--phase2);margin-top:28px">
+      <span class="psh-label" style="color:var(--phase2)">Phase 02 · The Pitch</span>
+      <div class="psh-line"></div>
+      <span class="psh-total" style="color:var(--phase2)">50 pts</span>
+    </div>
+    <div class="criteria-list">
+      <div class="criteria-card" style="--acc:#2E7D62" onclick="toggleCard(this)">
+        <div class="criteria-top">
+          <div><p class="criteria-name">Clarity of Idea</p><div class="criteria-bar-bg"><div class="criteria-bar-fill" style="width:60%"></div></div></div>
+          <span class="criteria-marks">15</span>
+        </div>
+        <p class="criteria-desc">Can the team clearly explain what their product is, who it's for, and why it matters? Judges are not looking for a memorised script — they want to see that the team genuinely understands what they've chosen to advertise and can communicate it simply and convincingly.</p>
+      </div>
+      <div class="criteria-card" style="--acc:#3A7A5A" onclick="toggleCard(this)">
+        <div class="criteria-top">
+          <div><p class="criteria-name">Confidence &amp; Delivery</p><div class="criteria-bar-bg"><div class="criteria-bar-fill" style="width:60%"></div></div></div>
+          <span class="criteria-marks">15</span>
+        </div>
+        <p class="criteria-desc">Does the team command the room? Judges look for composure, eye contact, and the ability to speak naturally without reading from notes. Nervous energy is fine — judges want to see that the team is genuinely present and engaged, not reciting a prepared speech.</p>
+      </div>
+      <div class="criteria-card" style="--acc:#4A9A72" onclick="toggleCard(this)">
+        <div class="criteria-top">
+          <div><p class="criteria-name">Product Knowledge</p><div class="criteria-bar-bg"><div class="criteria-bar-fill" style="width:48%"></div></div></div>
+          <span class="criteria-marks">12</span>
+        </div>
+        <p class="criteria-desc">How deeply does the team know their product? Judges will probe — asking about features, target users, competitors, and the decisions behind the campaign. Teams who chose a product they genuinely care about and researched properly will always outperform those who picked something convenient.</p>
+      </div>
+      <div class="criteria-card" style="--acc:#5AB882" onclick="toggleCard(this)">
+        <div class="criteria-top">
+          <div><p class="criteria-name">Response to Questions</p><div class="criteria-bar-bg"><div class="criteria-bar-fill" style="width:32%"></div></div></div>
+          <span class="criteria-marks">8</span>
+        </div>
+        <p class="criteria-desc">How well does the team handle judge questions? A strong answer under pressure — especially when questioned on a weak point — demonstrates real understanding. Teams that admit what they don't know and respond thoughtfully will score well here. Bluffing rarely works.</p>
+      </div>
+    </div>
+
+    <div class="total-line">
+      <div>
+        <div class="total-line-label">Grand Total</div>
+        <div class="total-split">Phase 01: 50 pts &nbsp;+&nbsp; Phase 02: 50 pts</div>
+      </div>
+      <span class="total-line-num">100</span>
+    </div>
+
+    <p class="section-label" style="margin-bottom:12px">Grade Bands</p>
+    <div class="grade-grid" style="margin-bottom:0">
+      <div class="grade-card"><span class="grade-range" style="color:#B5862A">90–100</span><span class="grade-label">Distinction</span></div>
+      <div class="grade-card"><span class="grade-range" style="color:#2E7D62">75–89</span><span class="grade-label">Merit</span></div>
+      <div class="grade-card"><span class="grade-range" style="color:#2A6496">60–74</span><span class="grade-label">Pass</span></div>
+      <div class="grade-card"><span class="grade-range" style="color:#999">Below 60</span><span class="grade-label">Participation</span></div>
+    </div>
+
+    <div class="spotlight-section">
+      <div class="ss-label">★ &nbsp; Closing Ceremony Spotlight</div>
+      <div class="ss-title">The Best Ad Takes the Screen</div>
+      <div class="ss-body">The team with the highest combined score will have their video screened at TechQuest's closing ceremony — in front of the entire school, teachers, and guests. The top three teams are awarded ranked positions on stage.</div>
+      <div class="sc-item"><div class="sc-dot"></div><div class="sc-text"><strong>Eligibility:</strong> All teams with a submitted video qualify automatically.</div></div>
+      <div class="sc-item"><div class="sc-dot"></div><div class="sc-text"><strong>Selection:</strong> Highest grand total score across both phases wins 1st place.</div></div>
+      <div class="sc-item"><div class="sc-dot"></div><div class="sc-text"><strong>On the day:</strong> 1st place video is screened at the closing ceremony. All three ranked teams are called to the stage.</div></div>
+    </div>
+
+  </div>
+
+  <!-- GUIDELINES -->
+  <div id="panel-guidelines" class="panel">
+
+    <p class="about-lead">A few things to know before you start building your campaign.</p>
+
+    <div class="details-table" style="margin-bottom:20px">
+      <div class="detail-row"><span class="detail-label">Open To</span><span class="detail-value">Classes 5 – 12</span></div>
+      <div class="detail-row"><span class="detail-label">Team Size</span><span class="detail-value">Solo or teams of up to 6</span></div>
+      <div class="detail-row"><span class="detail-label">Product</span><span class="detail-value">Your choice — real or imagined</span></div>
+      <div class="detail-row"><span class="detail-label">Video</span><span class="detail-value">Mandatory — any format</span></div>
+      <div class="detail-row"><span class="detail-label">Stage Time</span><span class="detail-value">Up to 5 minutes per team</span></div>
+    </div>
+
+    <div class="info-box" style="margin-bottom:12px">
+      <p><strong style="color:var(--navy);font-weight:500">You choose your product.</strong> There are no restrictions on what you advertise. An app, an AI tool, a clothing line, a food brand, a service — real or entirely made up. The product choice itself is part of your score. Pick something you can sell convincingly.</p>
+    </div>
+
+    <div class="info-box" style="margin-bottom:12px">
+      <p><strong style="color:var(--navy);font-weight:500">A video is required.</strong> Every team must produce and submit a video advertisement. Beyond that, you are free to add a live skit, a performance, or a product demonstration on the day — as long as everything fits within the 5-minute window.</p>
+    </div>
+
+    <div class="info-box" style="margin-bottom:12px">
+      <p><strong style="color:var(--navy);font-weight:500">All videos are reviewed before the event.</strong> Event heads will check every submission before the day. This is a content check only — there are no restrictions on style, length, language choice, or production approach beyond basic decency.</p>
+    </div>
+
+
+    <div class="info-box gold-box">
+      <p>✦ &nbsp; Judges are teachers and the Principal. They will be watching both the ad and the pitch, and they will ask questions. Know your product, know your campaign, and be ready to stand behind every decision you made.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- CONTACT -->
+<div class="contact-section">
+  <div class="contact-inner">
+    <div class="contact-label">Contact</div>
+    <div class="contact-title">For further details, contact the Event Heads</div>
+    <p class="contact-sub">Reach out to any of the Ad Break event heads from Class 12C for queries about registration, submissions, or the event format.</p>
+    <div class="heads-grid">
+      <div class="head-card"><div class="head-name">Ansh Bhadauria</div><div class="head-class">Class 12C</div></div>
+      <div class="head-card"><div class="head-name">Sristi Gupta</div><div class="head-class">Class 12C</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span class="ft-left">TechQuest · The Ad Break</span>
+  <span class="ft-right">Classes 5 – 12</span>
+</footer>
+
+<script>
+  const chipTexts = [
+    "✦ An AI tutor that adapts to how you learn.",
+    "✦ A brand built around slow, sustainable fashion.",
+    "✦ An app that finds food near you in 60 seconds.",
+    "✦ Build a full site without writing a line of code.",
+    "✦ A wearable that tracks your focus, not just steps.",
+    "✦ Everyday products made with zero waste packaging."
+  ];
+  const originals = ['"An AI Study Tool"','"A Clothing Brand"','"A Food Delivery App"','"A Website Builder"','"A Fitness Tracker"','"An Eco Product"'];
+
+  function flipChip(el, idx) {
+    if(el.classList.contains('flipped')){ el.classList.remove('flipped'); el.textContent = originals[idx]; }
+    else { el.classList.add('flipped'); el.textContent = chipTexts[idx]; }
+  }
+  function switchTab(id, btn) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('panel-' + id).classList.add('active');
+    btn.classList.add('active');
+  }
+  function toggleCard(el) { el.classList.toggle('open'); }
+</script>
+</body>
+</html>

@@ -1,0 +1,572 @@
+/* ═══════════════════════════════════════════════════════════
+   sprites.css — Tech Sprites + Anime Characters
+   TechQuest 2026
+═══════════════════════════════════════════════════════════ */
+
+/* ══ SHARED BUBBLE + WRAP ══ */
+.sprite-wrap {
+  position: fixed;
+  pointer-events: all;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 7px;
+  opacity: 0;
+  animation: spriteEnter .55s cubic-bezier(.34,1.56,.64,1) forwards;
+}
+@keyframes spriteEnter {
+  from { opacity:0; transform:translateY(22px) scale(.82); }
+  to   { opacity:1; transform:translateY(0) scale(1); }
+}
+.sprite-wrap.leaving {
+  animation: spriteLeave .38s ease forwards !important;
+}
+@keyframes spriteLeave {
+  to { opacity:0; transform:translateY(14px) scale(.88); }
+}
+.sprite-bubble {
+  background: rgba(6,10,26,0.94);
+  border: 1px solid rgba(79,111,255,0.28);
+  border-radius: 10px 10px 2px 10px;
+  padding: 9px 28px 9px 12px;
+  max-width: 220px;
+  min-width: 130px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: .66em;
+  color: #c8ddf0;
+  line-height: 1.55;
+  box-shadow: 0 4px 28px rgba(0,0,0,.6), 0 0 14px rgba(79,111,255,.1);
+  position: relative;
+}
+.sprite-bubble.left-side {
+  border-radius: 10px 10px 10px 2px;
+}
+.sprite-bubble.anime-bubble {
+  border-color: rgba(255,100,100,0.35);
+  box-shadow: 0 4px 28px rgba(0,0,0,.7), 0 0 18px rgba(255,80,80,.12);
+}
+.sprite-bubble .dismiss-btn {
+  position:absolute; top:5px; right:7px;
+  background:none; border:none;
+  color:rgba(78,106,136,.65); font-size:.95em;
+  cursor:pointer; padding:0; line-height:1;
+  transition:color .18s;
+}
+.sprite-bubble .dismiss-btn:hover { color:#e05c6b; }
+.bubble-text { min-height:1em; }
+.anime-name-tag {
+  font-size:.58em;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  margin-bottom:4px;
+  opacity:.7;
+}
+
+/* ══ SPRITE BODIES SHARED ══ */
+.sprite-body { width:44px; height:56px; position:relative; flex-shrink:0; cursor:default; }
+
+/* ══════════════════════
+   TECH SPRITES
+══════════════════════ */
+
+/* AXIOM — blue robot */
+.axiom-antenna{width:2px;height:8px;background:#4f6fff;position:absolute;top:-9px;left:13px;border-radius:1px;}
+.axiom-antenna::after{content:'';width:5px;height:5px;background:#29d4e0;border-radius:50%;position:absolute;top:-4px;left:-1.5px;animation:antBlink 1.5s ease-in-out infinite;box-shadow:0 0 6px #29d4e0;}
+@keyframes antBlink{0%,100%{opacity:.35}50%{opacity:1}}
+.axiom-head{width:28px;height:22px;background:#0d1e42;border:1.5px solid #4f6fff;border-radius:5px 5px 3px 3px;position:absolute;top:0;left:8px;box-shadow:0 0 8px rgba(79,111,255,.4);}
+.axiom-visor{width:16px;height:8px;background:linear-gradient(135deg,#29d4e0,#4f6fff);border-radius:2px;position:absolute;top:7px;left:6px;box-shadow:0 0 6px rgba(41,212,224,.6);animation:vPulse 2s ease-in-out infinite;}
+@keyframes vPulse{0%,100%{opacity:.8}50%{opacity:1;box-shadow:0 0 12px rgba(41,212,224,.9)}}
+.axiom-body{width:34px;height:20px;background:#0a1630;border:1.5px solid #4f6fff;border-radius:4px;position:absolute;top:20px;left:5px;}
+.axiom-chest{width:8px;height:8px;background:#4f6fff;border-radius:50%;position:absolute;top:6px;left:13px;animation:cPulse 2.5s ease-in-out infinite;box-shadow:0 0 8px rgba(79,111,255,.7);}
+@keyframes cPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.3)}}
+.axiom-arm-l,.axiom-arm-r{width:6px;height:14px;background:#0d1e42;border:1.5px solid #4f6fff;border-radius:3px;position:absolute;top:21px;}
+.axiom-arm-l{left:0}.axiom-arm-r{right:0}
+.axiom-leg-l,.axiom-leg-r{width:9px;height:12px;background:#0a1630;border:1.5px solid #4f6fff;border-radius:2px 2px 4px 4px;position:absolute;top:38px;}
+.axiom-leg-l{left:8px}.axiom-leg-r{right:8px}
+.sprite-body.axiom{animation:bobFloat 2.8s ease-in-out infinite;}
+
+/* GLITCH — green alien */
+.glitch-ant-l,.glitch-ant-r{width:2px;height:10px;background:#3dd68c;position:absolute;top:-10px;border-radius:1px;}
+.glitch-ant-l{left:8px;transform:rotate(-15deg)}.glitch-ant-r{right:8px;transform:rotate(22deg);}
+.glitch-ant-l::after,.glitch-ant-r::after{content:'';width:5px;height:5px;background:#3dd68c;border-radius:50%;position:absolute;top:-4px;left:-1.5px;box-shadow:0 0 5px #3dd68c;}
+.glitch-head{width:30px;height:24px;background:#071a0f;border:1.5px solid #3dd68c;border-radius:50% 50% 30% 30%;position:absolute;top:0;left:7px;box-shadow:0 0 10px rgba(61,214,140,.35);}
+.glitch-eye-l,.glitch-eye-r{width:7px;height:9px;background:#3dd68c;border-radius:50%;position:absolute;top:8px;box-shadow:0 0 6px #3dd68c;}
+.glitch-eye-l{left:5px;animation:gBlink 3s .4s ease-in-out infinite;}.glitch-eye-r{right:5px;width:5px;height:11px;animation:gBlink 3s ease-in-out infinite;}
+@keyframes gBlink{0%,90%,100%{transform:scaleY(1)}92%,98%{transform:scaleY(.05)}}
+.glitch-body{width:28px;height:18px;background:#071a0f;border:1.5px solid #3dd68c;border-radius:6px;position:absolute;top:22px;left:8px;}
+.glitch-arm-l,.glitch-arm-r{width:5px;height:12px;background:#071a0f;border:1.5px solid #3dd68c;border-radius:3px;position:absolute;top:23px;}
+.glitch-arm-l{left:3px}.glitch-arm-r{right:3px}
+.glitch-leg-l,.glitch-leg-r{width:8px;height:11px;background:#071a0f;border:1.5px solid #3dd68c;border-radius:2px 2px 4px 4px;position:absolute;top:38px;}
+.glitch-leg-l{left:9px}.glitch-leg-r{right:9px}
+.sprite-body.glitch{animation:glitchFloat 2.2s ease-in-out infinite;}
+@keyframes glitchFloat{0%,100%{transform:translateY(0) skewX(0deg)}25%{transform:translateY(-5px) skewX(-1deg)}50%{transform:translateY(-8px) skewX(1deg)}75%{transform:translateY(-4px)}}
+
+/* NOVA — gold astronaut */
+.nova-helmet{width:30px;height:28px;background:#0e1524;border:2px solid #e8b84b;border-radius:50%;position:absolute;top:0;left:7px;box-shadow:0 0 10px rgba(232,184,75,.35);}
+.nova-visor{width:18px;height:12px;background:linear-gradient(135deg,rgba(232,184,75,.6),rgba(232,184,75,.2));border-radius:50%;position:absolute;top:8px;left:6px;animation:nVisor 3s ease-in-out infinite;}
+@keyframes nVisor{0%,100%{opacity:.7}50%{opacity:1}}
+.nova-reflect{width:5px;height:3px;background:rgba(255,255,255,.5);border-radius:50%;position:absolute;top:10px;left:8px;}
+.nova-body{width:32px;height:19px;background:#0c1520;border:1.5px solid #e8b84b;border-radius:5px;position:absolute;top:26px;left:6px;}
+.nova-pack{width:10px;height:14px;background:#0a1018;border:1.5px solid rgba(232,184,75,.5);border-radius:3px;position:absolute;top:27px;left:17px;}
+.nova-arm-l,.nova-arm-r{width:6px;height:15px;background:#0c1520;border:1.5px solid #e8b84b;border-radius:3px;position:absolute;top:27px;}
+.nova-arm-l{left:1px}.nova-arm-r{right:1px}
+.nova-boot-l,.nova-boot-r{width:10px;height:12px;background:#0a1018;border:1.5px solid #e8b84b;border-radius:2px 2px 5px 5px;position:absolute;top:43px;}
+.nova-boot-l{left:7px}.nova-boot-r{right:7px}
+.nova-flame-l,.nova-flame-r{width:4px;height:6px;background:linear-gradient(180deg,#e8b84b,transparent);border-radius:0 0 50% 50%;position:absolute;top:53px;animation:nFlame .4s ease-in-out infinite alternate;}
+.nova-flame-l{left:9px}.nova-flame-r{right:9px}
+@keyframes nFlame{from{height:4px;opacity:.6}to{height:9px;opacity:1}}
+.sprite-body.nova{animation:novaFloat 3.5s ease-in-out infinite;}
+@keyframes novaFloat{0%,100%{transform:translateY(0) rotate(0deg)}33%{transform:translateY(-7px) rotate(1deg)}66%{transform:translateY(-4px) rotate(-1deg)}}
+
+/* BYTE — purple cyborg */
+.byte-head{width:26px;height:22px;background:#100d1f;border:1.5px solid #c088ff;border-radius:4px 4px 2px 2px;position:absolute;top:0;left:9px;box-shadow:0 0 8px rgba(192,136,255,.3);}
+.byte-eye-l,.byte-eye-r{width:6px;height:6px;border-radius:50%;position:absolute;top:7px;}
+.byte-eye-l{background:#c088ff;left:4px;box-shadow:0 0 6px #c088ff;animation:bEye 2s ease-in-out infinite;}
+.byte-eye-r{background:#ff72c0;right:4px;box-shadow:0 0 6px #ff72c0;animation:bEye 2s .5s ease-in-out infinite;}
+@keyframes bEye{0%,100%{transform:scale(1)}50%{transform:scale(1.3)}}
+.byte-body{width:30px;height:20px;background:#0e0c1c;border:1.5px solid #c088ff;border-radius:4px;position:absolute;top:20px;left:7px;}
+.byte-circuit{width:20px;height:2px;background:linear-gradient(90deg,#c088ff,transparent);position:absolute;top:28px;left:8px;border-radius:1px;box-shadow:0 0 4px rgba(192,136,255,.5);}
+.byte-circuit-2{width:14px;height:2px;background:linear-gradient(90deg,transparent,#ff72c0);position:absolute;top:32px;left:9px;border-radius:1px;}
+.byte-arm-r{width:6px;height:18px;background:#c088ff;border-radius:3px;position:absolute;top:21px;right:0;box-shadow:0 0 8px rgba(192,136,255,.5);animation:mechArm 3s ease-in-out infinite;transform-origin:top center;}
+@keyframes mechArm{0%,100%{transform:rotate(0deg)}40%{transform:rotate(15deg)}70%{transform:rotate(-8deg)}}
+.byte-arm-l{width:6px;height:14px;background:#0e0c1c;border:1.5px solid #c088ff;border-radius:3px;position:absolute;top:21px;left:0;}
+.byte-leg-l,.byte-leg-r{width:8px;height:11px;background:#0e0c1c;border:1.5px solid #c088ff;border-radius:2px 2px 4px 4px;position:absolute;top:38px;}
+.byte-leg-l{left:9px}.byte-leg-r{right:9px}
+.sprite-body.byte{animation:bobFloat 2.4s ease-in-out infinite;}
+
+/* KERNEL — cyan cat */
+.kernel-ear-l,.kernel-ear-r{width:9px;height:11px;background:#1a0e2e;border:1.5px solid #29d4e0;border-radius:50% 50% 0 0;position:absolute;top:-6px;}
+.kernel-ear-l{left:6px}.kernel-ear-r{right:6px}
+.kernel-head{width:30px;height:24px;background:#130d22;border:1.5px solid #29d4e0;border-radius:50% 50% 40% 40%;position:absolute;top:3px;left:7px;box-shadow:0 0 8px rgba(41,212,224,.3);}
+.kernel-eye-l,.kernel-eye-r{width:6px;height:7px;background:#29d4e0;border-radius:50%;position:absolute;top:8px;box-shadow:0 0 5px #29d4e0;animation:kBlink 4s ease-in-out infinite;}
+.kernel-eye-l{left:5px}.kernel-eye-r{right:5px}
+@keyframes kBlink{0%,88%,100%{transform:scaleY(1)}90%,96%{transform:scaleY(.1)}}
+.kernel-nose{width:5px;height:3px;background:#ff72c0;border-radius:50%;position:absolute;top:15px;left:12px;}
+.kernel-whisker-l,.kernel-whisker-r{width:10px;height:1px;background:rgba(41,212,224,.4);position:absolute;top:16px;border-radius:1px;}
+.kernel-whisker-l{left:-2px}.kernel-whisker-r{right:-2px}
+.kernel-body{width:28px;height:18px;background:#100d20;border:1.5px solid #29d4e0;border-radius:4px;position:absolute;top:25px;left:8px;}
+.kernel-collar{width:24px;height:5px;background:#29d4e0;border-radius:2px;position:absolute;top:27px;left:10px;opacity:.7;}
+.kernel-pack{width:12px;height:16px;background:#0a1518;border:1.5px solid rgba(41,212,224,.6);border-radius:3px;position:absolute;top:24px;right:1px;}
+.kernel-pack-led{width:3px;height:3px;background:#3dd68c;border-radius:50%;position:absolute;top:4px;left:4px;animation:pkLed .8s ease-in-out infinite alternate;box-shadow:0 0 4px #3dd68c;}
+@keyframes pkLed{from{opacity:.3}to{opacity:1}}
+.kernel-tail{width:14px;height:4px;background:#130d22;border:1.5px solid #29d4e0;border-radius:0 4px 4px 0;position:absolute;top:36px;right:-10px;transform-origin:left center;animation:tailWag 1.5s ease-in-out infinite;}
+@keyframes tailWag{0%,100%{transform:rotate(-20deg)}50%{transform:rotate(20deg)}}
+.kernel-leg-l,.kernel-leg-r{width:8px;height:10px;background:#100d20;border:1.5px solid #29d4e0;border-radius:2px 2px 5px 5px;position:absolute;top:41px;}
+.kernel-leg-l{left:9px}.kernel-leg-r{right:12px}
+.sprite-body.kernel{animation:kernelFloat 3s ease-in-out infinite;}
+@keyframes kernelFloat{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-7px) rotate(-2deg)}}
+
+/* DRIFT — blue ghost */
+.drift-body-main{width:32px;height:28px;background:rgba(79,111,255,.12);border:1.5px solid rgba(79,111,255,.5);border-radius:50% 50% 30% 30%;position:absolute;top:4px;left:6px;box-shadow:0 0 16px rgba(79,111,255,.3);animation:dPhase 3s ease-in-out infinite;}
+@keyframes dPhase{0%,100%{opacity:.85;filter:blur(0px)}50%{opacity:1;filter:blur(.5px)}}
+.drift-eye-l,.drift-eye-r{width:6px;height:8px;background:#fff;border-radius:50%;position:absolute;top:9px;}
+.drift-eye-l{left:6px}.drift-eye-r{right:6px}
+.drift-pupil-l,.drift-pupil-r{width:3px;height:4px;background:#3d5fe0;border-radius:50%;position:absolute;top:11px;}
+.drift-pupil-l{left:8px}.drift-pupil-r{right:8px}
+.drift-tail-1,.drift-tail-2,.drift-tail-3{width:10px;height:12px;background:rgba(79,111,255,.12);border:1.5px solid rgba(79,111,255,.4);position:absolute;top:29px;border-radius:0 0 50% 50%;}
+.drift-tail-1{left:3px;animation:dTail .9s ease-in-out infinite;}
+.drift-tail-2{left:13px;animation:dTail .9s .15s ease-in-out infinite;}
+.drift-tail-3{left:23px;animation:dTail .9s .3s ease-in-out infinite;}
+@keyframes dTail{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.7)}}
+.drift-laptop{width:20px;height:12px;background:#0a1020;border:1.5px solid rgba(79,111,255,.5);border-radius:2px;position:absolute;top:42px;left:12px;}
+.drift-screen{width:16px;height:8px;background:rgba(79,111,255,.3);border-radius:1px;position:absolute;top:1px;left:1px;animation:screenFlick 4s ease-in-out infinite;}
+@keyframes screenFlick{0%,95%,100%{opacity:1}96%,99%{opacity:.4}}
+.sprite-body.drift{animation:driftFloat 4s ease-in-out infinite;}
+@keyframes driftFloat{0%,100%{transform:translateY(0) rotate(0deg)}25%{transform:translateY(-9px) rotate(2deg)}75%{transform:translateY(-5px) rotate(-2deg)}}
+
+@keyframes bobFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+
+/* ══════════════════════
+   ANIME SPRITES
+══════════════════════ */
+
+/* shared anime body base */
+.anime-body {
+  position: relative;
+  flex-shrink: 0;
+  cursor: default;
+  width: 48px;
+  height: 64px;
+  animation: animeFloat 3s ease-in-out infinite;
+}
+@keyframes animeFloat {
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-8px)}
+}
+
+/* ── GOJO SATORU ── white hair, blindfold, dark uniform */
+.gojo-hair {
+  width:38px;height:20px;
+  background:#f0f0f0;
+  border-radius:50% 50% 20% 20%;
+  position:absolute;top:0;left:5px;
+  box-shadow:0 0 10px rgba(255,255,255,.4);
+}
+.gojo-blindfold {
+  width:28px;height:7px;
+  background:#1a1a2e;
+  border:1px solid #333;
+  border-radius:2px;
+  position:absolute;top:12px;left:10px;
+}
+.gojo-face {
+  width:30px;height:22px;
+  background:#f5d5b8;
+  border-radius:40% 40% 45% 45%;
+  position:absolute;top:8px;left:9px;
+}
+.gojo-smile {
+  width:10px;height:4px;
+  border-bottom:2px solid #c4956a;
+  border-radius:0 0 50% 50%;
+  position:absolute;top:20px;left:19px;
+}
+.gojo-body {
+  width:32px;height:22px;
+  background:#0a0a1a;
+  border:1.5px solid #333;
+  border-radius:5px;
+  position:absolute;top:28px;left:8px;
+}
+.gojo-collar {
+  width:10px;height:10px;
+  background:#0a0a1a;
+  border:1px solid #555;
+  border-radius:0 0 50% 50%;
+  position:absolute;top:28px;left:19px;
+}
+.gojo-arm-l,.gojo-arm-r{width:7px;height:18px;background:#0a0a1a;border:1px solid #333;border-radius:3px;position:absolute;top:29px;}
+.gojo-arm-l{left:2px;animation:gojoArmL 3s ease-in-out infinite;}
+.gojo-arm-r{right:2px;}
+@keyframes gojoArmL{0%,100%{transform:rotate(0deg);transform-origin:top center}50%{transform:rotate(-15deg);transform-origin:top center}}
+.gojo-leg-l,.gojo-leg-r{width:10px;height:14px;background:#0a0a1a;border:1px solid #333;border-radius:2px 2px 4px 4px;position:absolute;top:48px;}
+.gojo-leg-l{left:9px}.gojo-leg-r{right:9px}
+.sprite-body.gojo{animation:animeFloat 3s ease-in-out infinite;}
+
+/* ── GOJO PURPLE FLASH ── same but with purple orb */
+.sprite-body.gojo-purple .gojo-hair { box-shadow:0 0 16px rgba(192,136,255,.8); }
+.gojo-orb {
+  width:18px;height:18px;
+  background:radial-gradient(circle at 40% 35%, #e0aaff, #8b00ff);
+  border-radius:50%;
+  position:absolute;top:30px;left:-8px;
+  box-shadow:0 0 20px rgba(192,136,255,.9), 0 0 40px rgba(140,0,255,.5);
+  animation:orbPulse .8s ease-in-out infinite alternate;
+}
+@keyframes orbPulse{from{transform:scale(1);box-shadow:0 0 14px rgba(192,136,255,.8)}to{transform:scale(1.2);box-shadow:0 0 28px rgba(192,136,255,1),0 0 50px rgba(140,0,255,.7)}}
+
+/* ── SUKUNA ── spiky hair, tattoos, menacing */
+.sukuna-hair {
+  width:36px;height:18px;
+  background:#2a0a0a;
+  border-radius:30% 30% 0 0;
+  position:absolute;top:0;left:6px;
+}
+.sukuna-spike-1,.sukuna-spike-2,.sukuna-spike-3 {
+  width:6px;height:14px;
+  background:#2a0a0a;
+  border-radius:50% 50% 0 0;
+  position:absolute;top:-10px;
+}
+.sukuna-spike-1{left:9px;transform:rotate(-10deg);}
+.sukuna-spike-2{left:18px;}
+.sukuna-spike-3{right:9px;transform:rotate(10deg);}
+.sukuna-face {
+  width:28px;height:22px;
+  background:#f0c8a0;
+  border-radius:40%;
+  position:absolute;top:10px;left:10px;
+}
+.sukuna-tattoo-l,.sukuna-tattoo-r {
+  width:6px;height:2px;
+  background:#8b0000;
+  border-radius:1px;
+  position:absolute;top:17px;
+}
+.sukuna-tattoo-l{left:11px;}
+.sukuna-tattoo-r{right:11px;}
+.sukuna-extra-eyes {
+  width:8px;height:3px;
+  background:#cc0000;
+  border-radius:50%;
+  position:absolute;top:14px;left:20px;
+  box-shadow:0 0 4px #cc0000;
+  animation:eyeGlow .8s ease-in-out infinite alternate;
+}
+@keyframes eyeGlow{from{opacity:.5}to{opacity:1;box-shadow:0 0 8px #cc0000}}
+.sukuna-body {
+  width:34px;height:22px;
+  background:#1a0808;
+  border:1px solid #8b0000;
+  border-radius:4px;
+  position:absolute;top:30px;left:7px;
+  box-shadow:0 0 8px rgba(139,0,0,.3);
+}
+.sukuna-arm-l,.sukuna-arm-r{width:7px;height:17px;background:#1a0808;border:1px solid #8b0000;border-radius:3px;position:absolute;top:31px;}
+.sukuna-arm-l{left:1px}.sukuna-arm-r{right:1px}
+.sukuna-leg-l,.sukuna-leg-r{width:11px;height:14px;background:#1a0808;border:1px solid #8b0000;border-radius:2px 2px 5px 5px;position:absolute;top:50px;}
+.sukuna-leg-l{left:8px}.sukuna-leg-r{right:8px}
+.sprite-body.sukuna{animation:sukunaFloat 2.5s ease-in-out infinite;}
+@keyframes sukunaFloat{0%,100%{transform:translateY(0) rotate(.5deg)}50%{transform:translateY(-7px) rotate(-.5deg)}}
+
+/* ── YUJI ITADORI ── pink hair, athletic */
+.yuji-hair{width:34px;height:16px;background:#e88080;border-radius:50% 50% 20% 20%;position:absolute;top:0;left:7px;}
+.yuji-face{width:28px;height:20px;background:#f5c5a0;border-radius:40%;position:absolute;top:10px;left:10px;}
+.yuji-eyes{display:flex;gap:6px;position:absolute;top:15px;left:14px;}
+.yuji-eye{width:5px;height:5px;background:#5a3020;border-radius:50%;}
+.yuji-body{width:36px;height:24px;background:#e8c060;border:1px solid #c8a040;border-radius:5px;position:absolute;top:28px;left:6px;}
+.yuji-stripe{width:36px;height:3px;background:#c8a040;position:absolute;top:36px;left:6px;}
+.yuji-arm-l,.yuji-arm-r{width:8px;height:18px;background:#f5c5a0;border-radius:4px;position:absolute;top:29px;}
+.yuji-arm-l{left:0px;animation:yujiPunch 1.5s ease-in-out infinite;}
+.yuji-arm-r{right:0px;}
+@keyframes yujiPunch{0%,100%{transform:rotate(0deg);transform-origin:top center}50%{transform:rotate(20deg);transform-origin:top center}}
+.yuji-leg-l,.yuji-leg-r{width:11px;height:14px;background:#2a2a4a;border-radius:2px 2px 5px 5px;position:absolute;top:50px;}
+.yuji-leg-l{left:8px}.yuji-leg-r{right:8px}
+.sprite-body.yuji{animation:animeFloat 2.6s ease-in-out infinite;}
+
+/* ── MEGUMI ── dark hair, stoic */
+.megumi-hair{width:32px;height:20px;background:#1a1a2e;border-radius:40% 40% 10% 10%;position:absolute;top:0;left:8px;}
+.megumi-bang{width:14px;height:12px;background:#1a1a2e;border-radius:0 50% 50% 0;position:absolute;top:4px;left:8px;}
+.megumi-face{width:26px;height:20px;background:#f0c8a8;border-radius:40%;position:absolute;top:12px;left:11px;}
+.megumi-frown{width:8px;height:3px;border-top:1.5px solid #8a6a50;border-radius:50% 50% 0 0;position:absolute;top:24px;left:20px;}
+.megumi-body{width:30px;height:22px;background:#0a0a1a;border:1px solid #2a2a4a;border-radius:4px;position:absolute;top:30px;left:9px;}
+.megumi-arm-l,.megumi-arm-r{width:6px;height:16px;background:#0a0a1a;border:1px solid #2a2a4a;border-radius:3px;position:absolute;top:31px;}
+.megumi-arm-l{left:3px}.megumi-arm-r{right:3px}
+.megumi-shadow{width:16px;height:16px;background:rgba(0,0,0,.7);border-radius:50%;position:absolute;top:38px;left:16px;animation:shadowPulse 2s ease-in-out infinite;box-shadow:0 0 12px rgba(0,0,0,.9);}
+@keyframes shadowPulse{0%,100%{transform:scale(1);opacity:.7}50%{transform:scale(1.3);opacity:1}}
+.megumi-leg-l,.megumi-leg-r{width:9px;height:13px;background:#0a0a1a;border-radius:2px 2px 4px 4px;position:absolute;top:50px;}
+.megumi-leg-l{left:10px}.megumi-leg-r{right:10px}
+.sprite-body.megumi{animation:animeFloat 3.2s ease-in-out infinite;}
+
+/* ── NOBARA ── auburn hair, hammer */
+.nobara-hair{width:34px;height:18px;background:#b05020;border-radius:50% 50% 30% 30%;position:absolute;top:0;left:7px;}
+.nobara-bun{width:14px;height:12px;background:#b05020;border-radius:50%;position:absolute;top:-4px;right:10px;}
+.nobara-face{width:26px;height:20px;background:#f8c8a8;border-radius:40%;position:absolute;top:12px;left:11px;}
+.nobara-body{width:30px;height:22px;background:#2a0a30;border:1px solid #5a1a60;border-radius:4px;position:absolute;top:30px;left:9px;}
+.nobara-hammer{width:5px;height:20px;background:#8a6040;border-radius:2px;position:absolute;top:22px;right:0px;transform:rotate(-20deg);}
+.nobara-hammer::after{content:'';width:12px;height:8px;background:#6a4020;border-radius:2px;position:absolute;top:-4px;left:-4px;}
+.nobara-arm-l{width:6px;height:16px;background:#f8c8a8;border-radius:3px;position:absolute;top:31px;left:3px;}
+.nobara-leg-l,.nobara-leg-r{width:9px;height:13px;background:#1a0520;border-radius:2px 2px 4px 4px;position:absolute;top:50px;}
+.nobara-leg-l{left:10px}.nobara-leg-r{right:10px}
+.sprite-body.nobara{animation:nobaraFloat 2.8s ease-in-out infinite;}
+@keyframes nobaraFloat{0%,100%{transform:translateY(0) rotate(-.5deg)}50%{transform:translateY(-8px) rotate(.5deg)}}
+
+/* ── GOKU ── spiky black hair, orange gi */
+.goku-hair{width:36px;height:22px;background:#1a1a1a;border-radius:20% 20% 0 0;position:absolute;top:0;left:6px;}
+.goku-spike-1,.goku-spike-2,.goku-spike-3,.goku-spike-4{width:8px;height:16px;background:#1a1a1a;border-radius:50% 50% 0 0;position:absolute;top:-12px;}
+.goku-spike-1{left:4px;transform:rotate(-20deg);}
+.goku-spike-2{left:12px;transform:rotate(-8deg);}
+.goku-spike-3{left:20px;transform:rotate(8deg);}
+.goku-spike-4{right:4px;transform:rotate(20deg);}
+.goku-face{width:28px;height:20px;background:#f5c090;border-radius:40%;position:absolute;top:12px;left:10px;}
+.goku-scar{width:12px;height:2px;background:#d4a070;border-radius:1px;position:absolute;top:17px;left:18px;transform:rotate(-15deg);}
+.goku-body{width:34px;height:24px;background:#ff6600;border:1.5px solid #cc4400;border-radius:5px;position:absolute;top:30px;left:7px;}
+.goku-belt{width:34px;height:5px;background:#1a1a1a;position:absolute;top:40px;left:7px;}
+.goku-arm-l,.goku-arm-r{width:8px;height:18px;background:#ff6600;border:1px solid #cc4400;border-radius:3px;position:absolute;top:31px;}
+.goku-arm-l{left:1px;animation:gokuPower 2s ease-in-out infinite;}
+.goku-arm-r{right:1px}
+@keyframes gokuPower{0%,100%{transform:rotate(0deg);transform-origin:top center}50%{transform:rotate(-25deg);transform-origin:top center}}
+.goku-leg-l,.goku-leg-r{width:12px;height:14px;background:#1a1a1a;border-radius:2px 2px 5px 5px;position:absolute;top:52px;}
+.goku-leg-l{left:8px}.goku-leg-r{right:8px}
+.goku-aura{width:60px;height:60px;background:radial-gradient(ellipse,rgba(255,220,50,.15),transparent 70%);border-radius:50%;position:absolute;top:-8px;left:-6px;animation:auraFlash 1.5s ease-in-out infinite;}
+@keyframes auraFlash{0%,100%{opacity:.4;transform:scale(1)}50%{opacity:.9;transform:scale(1.1)}}
+.sprite-body.goku{animation:gokuFloat 2.2s ease-in-out infinite;}
+@keyframes gokuFloat{0%,100%{transform:translateY(0)}25%{transform:translateY(-10px)}75%{transform:translateY(-5px)}}
+
+/* ── VEGETA ── widows peak, armor */
+.vegeta-hair{width:32px;height:28px;background:#1a1a1a;border-radius:20% 20% 0 0;clip-path:polygon(10% 100%,0% 0%,100% 0%,90% 100%);position:absolute;top:-4px;left:8px;}
+.vegeta-face{width:26px;height:20px;background:#f0b888;border-radius:40%;position:absolute;top:18px;left:11px;}
+.vegeta-scowl{width:10px;height:3px;border-top:2px solid #c09070;border-radius:50% 50% 0 0;position:absolute;top:24px;left:19px;}
+.vegeta-armor{width:36px;height:24px;background:#fff;border:1.5px solid #ccc;border-radius:6px;position:absolute;top:36px;left:6px;box-shadow:0 0 6px rgba(255,255,255,.3);}
+.vegeta-armor-trim{width:20px;height:4px;background:#1a1a1a;border-radius:2px;position:absolute;top:42px;left:14px;}
+.vegeta-arm-l,.vegeta-arm-r{width:8px;height:18px;background:#fff;border:1px solid #ddd;border-radius:3px;position:absolute;top:37px;}
+.vegeta-arm-l{left:0}.vegeta-arm-r{right:0}
+.vegeta-leg-l,.vegeta-leg-r{width:11px;height:13px;background:#1a1a1a;border-radius:2px 2px 5px 5px;position:absolute;top:58px;}
+.vegeta-leg-l{left:9px}.vegeta-leg-r{right:9px}
+.sprite-body.vegeta{animation:vegetaFloat 3s ease-in-out infinite;}
+@keyframes vegetaFloat{0%,100%{transform:translateY(0) rotate(-.3deg)}50%{transform:translateY(-7px) rotate(.3deg)}}
+
+/* ── LUFFY ── straw hat, red vest */
+.luffy-hat{width:44px;height:12px;background:#e8c840;border-radius:4px;position:absolute;top:-2px;left:2px;box-shadow:0 0 6px rgba(232,200,64,.3);}
+.luffy-hat-top{width:28px;height:14px;background:#e8c840;border-radius:50% 50% 0 0;position:absolute;top:-14px;left:10px;}
+.luffy-hat-band{width:44px;height:3px;background:#cc0000;position:absolute;top:10px;left:2px;border-radius:1px;}
+.luffy-face{width:28px;height:20px;background:#f5c090;border-radius:40%;position:absolute;top:10px;left:10px;}
+.luffy-scar{width:6px;height:3px;border-bottom:2px solid #cc0000;border-radius:0 0 50% 50%;position:absolute;top:18px;left:21px;}
+.luffy-smile{width:12px;height:5px;border-bottom:2px solid #c07050;border-radius:0 0 50% 50%;position:absolute;top:22px;left:18px;}
+.luffy-body{width:30px;height:22px;background:#cc2200;border:1.5px solid #aa1100;border-radius:5px;position:absolute;top:28px;left:9px;}
+.luffy-arm-l,.luffy-arm-r{width:6px;height:22px;background:#f5c090;border-radius:3px;position:absolute;top:28px;}
+.luffy-arm-l{left:1px;animation:luffyStretch 3s ease-in-out infinite;}
+.luffy-arm-r{right:1px}
+@keyframes luffyStretch{0%,100%{height:22px}50%{height:30px}}
+.luffy-leg-l,.luffy-leg-r{width:10px;height:14px;background:#1a1a4a;border-radius:2px 2px 5px 5px;position:absolute;top:48px;}
+.luffy-leg-l{left:9px}.luffy-leg-r{right:9px}
+.sprite-body.luffy{animation:luffyBounce 1.8s ease-in-out infinite;}
+@keyframes luffyBounce{0%,100%{transform:translateY(0)}40%{transform:translateY(-11px)}60%{transform:translateY(-8px)}}
+
+/* ── ZORO ── green hair, three swords */
+.zoro-hair{width:30px;height:18px;background:#3a8a3a;border-radius:40% 40% 10% 10%;position:absolute;top:0;left:9px;}
+.zoro-face{width:26px;height:20px;background:#f0b880;border-radius:40%;position:absolute;top:12px;left:11px;}
+.zoro-scar{width:2px;height:16px;background:#cc4444;position:absolute;top:12px;left:22px;transform:rotate(5deg);}
+.zoro-body{width:32px;height:22px;background:#1a1a2a;border:1px solid #333;border-radius:4px;position:absolute;top:30px;left:8px;}
+.zoro-bandana{width:36px;height:5px;background:#2a2a8a;border-radius:2px;position:absolute;top:12px;left:6px;}
+.zoro-sword-1,.zoro-sword-2,.zoro-sword-3{width:3px;border-radius:1px;position:absolute;background:linear-gradient(180deg,#e0e0e0,#a0a0a0);}
+.zoro-sword-1{height:30px;top:20px;right:0px;transform:rotate(15deg);}
+.zoro-sword-2{height:26px;top:24px;right:5px;transform:rotate(5deg);}
+.zoro-sword-3{height:28px;top:28px;left:0px;transform:rotate(-10deg);}
+.zoro-arm-l,.zoro-arm-r{width:7px;height:16px;background:#1a1a2a;border-radius:3px;position:absolute;top:31px;}
+.zoro-arm-l{left:1px}.zoro-arm-r{right:8px}
+.zoro-leg-l,.zoro-leg-r{width:10px;height:13px;background:#0a0a1a;border-radius:2px 2px 5px 5px;position:absolute;top:50px;}
+.zoro-leg-l{left:9px}.zoro-leg-r{right:9px}
+.sprite-body.zoro{animation:animeFloat 3.4s ease-in-out infinite;}
+
+/* ── NARUTO ── yellow spiky hair, orange suit */
+.naruto-hair{width:34px;height:20px;background:#f0c030;border-radius:20% 20% 0 0;position:absolute;top:0;left:7px;}
+.naruto-spike-l,.naruto-spike-r{width:10px;height:16px;background:#f0c030;border-radius:50% 50% 0 0;position:absolute;top:-10px;}
+.naruto-spike-l{left:6px;transform:rotate(-20deg);}
+.naruto-spike-r{right:6px;transform:rotate(20deg);}
+.naruto-face{width:28px;height:20px;background:#f5c090;border-radius:40%;position:absolute;top:12px;left:10px;}
+.naruto-whisker-l1,.naruto-whisker-l2,.naruto-whisker-r1,.naruto-whisker-r2{width:7px;height:1px;background:#c09070;position:absolute;border-radius:1px;}
+.naruto-whisker-l1{top:17px;left:11px;transform:rotate(-10deg);}
+.naruto-whisker-l2{top:20px;left:11px;}
+.naruto-whisker-r1{top:17px;right:11px;transform:rotate(10deg);}
+.naruto-whisker-r2{top:20px;right:11px;}
+.naruto-body{width:32px;height:22px;background:#ff6600;border:1.5px solid #cc4400;border-radius:5px;position:absolute;top:30px;left:8px;}
+.naruto-spiral{width:10px;height:10px;border:2px solid rgba(255,255,255,.5);border-radius:50%;position:absolute;top:33px;left:19px;}
+.naruto-arm-l,.naruto-arm-r{width:7px;height:17px;background:#ff6600;border:1px solid #cc4400;border-radius:3px;position:absolute;top:31px;}
+.naruto-arm-l{left:2px}.naruto-arm-r{right:2px}
+.naruto-leg-l,.naruto-leg-r{width:11px;height:13px;background:#1a1a2a;border-radius:2px 2px 5px 5px;position:absolute;top:50px;}
+.naruto-leg-l{left:8px}.naruto-leg-r{right:8px}
+.naruto-chakra{width:50px;height:50px;background:radial-gradient(ellipse,rgba(255,150,0,.1),transparent 70%);border-radius:50%;position:absolute;top:-5px;left:-1px;animation:chakraGlow 2s ease-in-out infinite;}
+@keyframes chakraGlow{0%,100%{opacity:.3}50%{opacity:.8}}
+.sprite-body.naruto{animation:narutoRun 1.2s ease-in-out infinite;}
+@keyframes narutoRun{0%,100%{transform:translateY(0) rotate(1deg)}50%{transform:translateY(-9px) rotate(-1deg)}}
+
+/* ── SASUKE ── dark hair, dark clothes */
+.sasuke-hair{width:30px;height:22px;background:#1a1a1a;border-radius:30% 30% 0 0;position:absolute;top:0;left:9px;}
+.sasuke-bang{width:10px;height:18px;background:#1a1a1a;border-radius:0 50% 50% 0;position:absolute;top:4px;left:9px;}
+.sasuke-face{width:24px;height:19px;background:#f0c8a0;border-radius:40%;position:absolute;top:14px;left:12px;}
+.sasuke-scowl{width:8px;height:3px;border-top:1.5px solid #c09870;border-radius:50%;position:absolute;top:21px;left:20px;}
+.sasuke-body{width:30px;height:22px;background:#0a0a2a;border:1px solid #2a2a5a;border-radius:4px;position:absolute;top:31px;left:9px;}
+.sasuke-arm-l,.sasuke-arm-r{width:6px;height:16px;background:#0a0a2a;border:1px solid #2a2a5a;border-radius:3px;position:absolute;top:32px;}
+.sasuke-arm-l{left:3px}.sasuke-arm-r{right:3px}
+.sasuke-sharingan{width:8px;height:8px;background:#cc0000;border-radius:50%;position:absolute;top:17px;left:21px;box-shadow:0 0 8px #cc0000;animation:sharinganSpin 2s linear infinite;}
+@keyframes sharinganSpin{from{box-shadow:0 0 4px #cc0000}to{box-shadow:0 0 14px #cc0000,0 0 6px #ff4444}}
+.sasuke-leg-l,.sasuke-leg-r{width:9px;height:13px;background:#0a0a2a;border-radius:2px 2px 4px 4px;position:absolute;top:51px;}
+.sasuke-leg-l{left:10px}.sasuke-leg-r{right:10px}
+.sprite-body.sasuke{animation:animeFloat 3.5s ease-in-out infinite;}
+
+/* ── KAKASHI ── silver hair, headband, mask */
+.kakashi-hair{width:28px;height:24px;background:#c8c8c8;border-radius:20% 20% 0 0;position:absolute;top:0;left:10px;transform:rotate(-5deg);}
+.kakashi-headband{width:36px;height:6px;background:#1a1a3a;border-radius:3px;position:absolute;top:14px;left:6px;}
+.kakashi-headband-plate{width:12px;height:6px;background:#a0a0b0;border-radius:1px;position:absolute;top:14px;left:18px;}
+.kakashi-mask{width:26px;height:14px;background:#c8c8c8;border-radius:4px;position:absolute;top:20px;left:11px;}
+.kakashi-eye{width:7px;height:5px;background:#1a4a1a;border-radius:50%;position:absolute;top:16px;left:17px;}
+.kakashi-sharingan{width:7px;height:7px;background:#cc2222;border-radius:50%;position:absolute;top:16px;right:13px;box-shadow:0 0 6px #cc2222;animation:sharinganSpin 3s linear infinite;}
+.kakashi-body{width:30px;height:22px;background:#3a3a3a;border:1px solid #555;border-radius:4px;position:absolute;top:32px;left:9px;}
+.kakashi-vest{width:24px;height:22px;background:#4a6a4a;border:1px solid #3a5a3a;border-radius:4px;position:absolute;top:32px;left:12px;}
+.kakashi-arm-l,.kakashi-arm-r{width:7px;height:17px;background:#3a3a3a;border-radius:3px;position:absolute;top:33px;}
+.kakashi-arm-l{left:2px}.kakashi-arm-r{right:2px}
+.kakashi-leg-l,.kakashi-leg-r{width:9px;height:13px;background:#1a1a1a;border-radius:2px 2px 4px 4px;position:absolute;top:52px;}
+.kakashi-leg-l{left:10px}.kakashi-leg-r{right:10px}
+.sprite-body.kakashi{animation:animeFloat 3.8s ease-in-out infinite;}
+
+/* ── LEVI ── undercut, ODM gear, Survey Corps */
+.levi-hair{width:26px;height:16px;background:#1a1a1a;border-radius:30% 30% 0 0;position:absolute;top:2px;left:11px;}
+.levi-undercut{width:36px;height:8px;background:#0a0a0a;border-radius:2px;position:absolute;top:14px;left:6px;}
+.levi-face{width:22px;height:18px;background:#e8c090;border-radius:40%;position:absolute;top:14px;left:13px;}
+.levi-frown-l,.levi-frown-r{width:6px;height:2px;border-top:1.5px solid #b09070;position:absolute;top:19px;}
+.levi-frown-l{left:15px;transform:rotate(-15deg);}
+.levi-frown-r{right:15px;transform:rotate(15deg);}
+.levi-body{width:28px;height:22px;background:#5a5a3a;border:1px solid #4a4a2a;border-radius:4px;position:absolute;top:30px;left:10px;}
+.levi-cloak{width:38px;height:20px;background:#c8c8c0;border-radius:4px 4px 8px 8px;position:absolute;top:28px;left:5px;opacity:.85;}
+.levi-blade-l,.levi-blade-r{width:2px;height:18px;background:linear-gradient(180deg,#e8e8e8,#a0a0a0);border-radius:1px;position:absolute;top:24px;}
+.levi-blade-l{left:2px;transform:rotate(-20deg);}
+.levi-blade-r{right:2px;transform:rotate(20deg);}
+.levi-leg-l,.levi-leg-r{width:9px;height:13px;background:#3a3a1a;border-radius:2px 2px 5px 5px;position:absolute;top:50px;}
+.levi-leg-l{left:10px}.levi-leg-r{right:10px}
+.sprite-body.levi{animation:leviFloat 2.6s ease-in-out infinite;}
+@keyframes leviFloat{0%,100%{transform:translateY(0) rotate(0deg)}30%{transform:translateY(-11px) rotate(-2deg)}70%{transform:translateY(-7px) rotate(1deg)}}
+
+/* ── LIGHT YAGAMI ── neat hair, suit, death note */
+.light-hair{width:30px;height:18px;background:#5a3010;border-radius:40% 40% 10% 10%;position:absolute;top:2px;left:9px;}
+.light-face{width:26px;height:20px;background:#f5c890;border-radius:40%;position:absolute;top:14px;left:11px;}
+.light-smirk{width:10px;height:4px;border-bottom:1.5px solid #c09060;border-radius:0 0 60% 40%;position:absolute;top:26px;left:22px;}
+.light-body{width:28px;height:24px;background:#1a1a3a;border:1.5px solid #3a3a6a;border-radius:4px;position:absolute;top:32px;left:10px;}
+.light-tie{width:6px;height:16px;background:#aa1111;border-radius:2px;position:absolute;top:33px;left:21px;}
+.light-note{width:14px;height:18px;background:#f5f0dc;border:1px solid #c8c090;border-radius:2px;position:absolute;top:30px;right:1px;box-shadow:0 2px 6px rgba(0,0,0,.4);}
+.light-note::after{content:'';width:10px;height:1px;background:#8a8060;position:absolute;top:5px;left:2px;box-shadow:0 3px 0 #8a8060,0 6px 0 #8a8060,0 9px 0 #8a8060;}
+.light-arm-l{width:6px;height:16px;background:#1a1a3a;border:1px solid #3a3a6a;border-radius:3px;position:absolute;top:33px;left:4px;}
+.light-leg-l,.light-leg-r{width:9px;height:12px;background:#0a0a1a;border-radius:2px 2px 4px 4px;position:absolute;top:54px;}
+.light-leg-l{left:11px}.light-leg-r{right:11px}
+.sprite-body.light{animation:lightFloat 4s ease-in-out infinite;}
+@keyframes lightFloat{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-6px) rotate(.5deg)}}
+
+/* ── PICCOLO ── green skin, cape, antenna */
+.piccolo-antenna-l,.piccolo-antenna-r{width:3px;height:12px;background:#2a6a2a;position:absolute;top:-12px;border-radius:1px 1px 0 0;}
+.piccolo-antenna-l{left:12px;transform:rotate(-10deg);}
+.piccolo-antenna-r{right:12px;transform:rotate(10deg);}
+.piccolo-head{width:30px;height:24px;background:#2a6a2a;border-radius:40% 40% 35% 35%;position:absolute;top:0;left:9px;}
+.piccolo-turban{width:34px;height:7px;background:#cc2222;border-radius:3px;position:absolute;top:6px;left:7px;}
+.piccolo-face{width:22px;height:16px;background:#3a8a3a;border-radius:40%;position:absolute;top:12px;left:13px;}
+.piccolo-body{width:32px;height:22px;background:#cc2222;border:1px solid #aa1111;border-radius:5px;position:absolute;top:22px;left:8px;}
+.piccolo-cape{width:44px;height:24px;background:#e8e8e8;border-radius:4px;position:absolute;top:20px;left:2px;opacity:.9;}
+.piccolo-arm-l,.piccolo-arm-r{width:8px;height:18px;background:#2a6a2a;border-radius:3px;position:absolute;top:24px;}
+.piccolo-arm-l{left:0}.piccolo-arm-r{right:0}
+.piccolo-leg-l,.piccolo-leg-r{width:11px;height:13px;background:#aa1111;border-radius:2px 2px 5px 5px;position:absolute;top:42px;}
+.piccolo-leg-l{left:8px}.piccolo-leg-r{right:8px}
+.sprite-body.piccolo{animation:animeFloat 3.6s ease-in-out infinite;}
+
+/* ── GOHAN ── teen SSJ2 look */
+.gohan-hair{width:32px;height:20px;background:#1a1a1a;border-radius:30% 30% 0 0;position:absolute;top:0;left:8px;}
+.gohan-spike{width:10px;height:16px;background:#1a1a1a;border-radius:50% 50% 0 0;position:absolute;top:-12px;left:18px;transform:rotate(5deg);}
+.gohan-face{width:26px;height:20px;background:#f5c090;border-radius:40%;position:absolute;top:14px;left:11px;}
+.gohan-body{width:30px;height:22px;background:#cc4400;border:1px solid #aa2200;border-radius:5px;position:absolute;top:32px;left:9px;}
+.gohan-arm-l,.gohan-arm-r{width:7px;height:17px;background:#cc4400;border:1px solid #aa2200;border-radius:3px;position:absolute;top:33px;}
+.gohan-arm-l{left:2px}.gohan-arm-r{right:2px}
+.gohan-aura{width:54px;height:54px;background:radial-gradient(ellipse,rgba(255,255,100,.12),transparent 70%);border-radius:50%;position:absolute;top:-8px;left:-3px;animation:auraFlash 1.8s ease-in-out infinite;}
+.gohan-leg-l,.gohan-leg-r{width:10px;height:13px;background:#1a1a1a;border-radius:2px 2px 5px 5px;position:absolute;top:52px;}
+.gohan-leg-l{left:9px}.gohan-leg-r{right:9px}
+.sprite-body.gohan{animation:animeFloat 2.8s ease-in-out infinite;}
+
+/* ── FRIEZA ── white/purple, final form */
+.frieza-head{width:28px;height:26px;background:#f0f0f8;border-radius:50% 50% 40% 40%;position:absolute;top:0;left:10px;box-shadow:0 0 8px rgba(200,180,255,.3);}
+.frieza-crown{width:34px;height:8px;background:#7a40aa;border-radius:4px 4px 0 0;position:absolute;top:4px;left:7px;}
+.frieza-face{width:20px;height:16px;background:#f0e8f8;border-radius:40%;position:absolute;top:12px;left:14px;}
+.frieza-eyes{display:flex;gap:5px;position:absolute;top:16px;left:16px;}
+.frieza-eye{width:4px;height:5px;background:#880088;border-radius:50%;}
+.frieza-body{width:28px;height:20px;background:#f0f0f8;border:1px solid #d0d0e8;border-radius:40% 40% 30% 30%;position:absolute;top:24px;left:10px;}
+.frieza-tail{width:5px;height:28px;background:#7a40aa;border-radius:2px;position:absolute;top:30px;right:0px;transform-origin:top center;animation:friTail 2s ease-in-out infinite;}
+@keyframes friTail{0%,100%{transform:rotate(-10deg)}50%{transform:rotate(15deg)}}
+.frieza-arm-l,.frieza-arm-r{width:6px;height:15px;background:#f0f0f8;border-radius:3px;position:absolute;top:25px;}
+.frieza-arm-l{left:4px}.frieza-arm-r{right:10px}
+.frieza-aura{width:56px;height:40px;background:radial-gradient(ellipse,rgba(180,100,255,.12),transparent 70%);position:absolute;top:10px;left:-4px;animation:auraFlash 2.5s ease-in-out infinite;}
+.frieza-leg-l,.frieza-leg-r{width:9px;height:10px;background:#f0f0f8;border-radius:2px 2px 5px 5px;position:absolute;top:42px;}
+.frieza-leg-l{left:11px}.frieza-leg-r{right:11px}
+.sprite-body.frieza{animation:friezaFloat 3.8s ease-in-out infinite;}
+@keyframes friezaFloat{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-9px) rotate(1deg)}}
+
+/* ── NAMI ── orange hair, orange staff */
+.nami-hair{width:32px;height:16px;background:#e07020;border-radius:40% 60% 20% 20%;position:absolute;top:2px;left:8px;}
+.nami-hair-long{width:8px;height:22px;background:#e07020;border-radius:0 0 50% 50%;position:absolute;top:10px;right:8px;}
+.nami-face{width:24px;height:20px;background:#f5c890;border-radius:40%;position:absolute;top:12px;left:12px;}
+.nami-body{width:26px;height:20px;background:#ff8844;border:1px solid #dd6622;border-radius:4px;position:absolute;top:30px;left:11px;}
+.nami-staff{width:3px;height:32px;background:#8a6030;border-radius:1px;position:absolute;top:14px;right:3px;}
+.nami-staff-top{width:10px;height:4px;background:#e0c050;border-radius:2px;position:absolute;top:12px;right:0px;}
+.nami-arm-l{width:6px;height:14px;background:#f5c890;border-radius:3px;position:absolute;top:31px;left:5px;}
+.nami-leg-l,.nami-leg-r{width:8px;height:12px;background:#1a1a3a;border-radius:2px 2px 5px 5px;position:absolute;top:48px;}
+.nami-leg-l{left:11px}.nami-leg-r{right:11px}
+.sprite-body.nami{animation:animeFloat 3.2s ease-in-out infinite;}
+
+/* ── SHANKS ── red hair, cape, missing arm */
+.shanks-hair{width:36px;height:20px;background:#cc2020;border-radius:40% 40% 20% 20%;position:absolute;top:0;left:6px;}
+.shanks-face{width:28px;height:20px;background:#f0b880;border-radius:40%;position:absolute;top:14px;left:10px;}
+.shanks-scar{width:2px;height:14px;background:#8a3030;position:absolute;top:14px;left:21px;transform:rotate(5deg);}
+.shanks-body{width:30px;height:22px;background:#8a1010;border:1px solid #6a0a0a;border-radius:5px;position:absolute;top:32px;left:9px;}
+.shanks-cape{width:42px;height:28px;background:#1a1a1a;border-radius:4px 4px 8px 8px;position:absolute;top:28px;left:3px;opacity:.8;}
+.shanks-arm{width:7px;height:18px;background:#8a1010;border-radius:3px;position:absolute;top:33px;right:3px;}
+.shanks-stump{width:10px;height:8px;background:#cc7050;border-radius:0 50% 50% 50%;position:absolute;top:33px;left:3px;}
+.shanks-leg-l,.shanks-leg-r{width:10px;height:13px;background:#0a0a0a;border-radius:2px 2px 5px 5px;position:absolute;top:52px;}
+.shanks-leg-l{left:9px}.shanks-leg-r{right:9px}
+.sprite-body.shanks{animation:animeFloat 4s ease-in-out infinite;}
