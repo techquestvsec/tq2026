@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Robot Snooze &mdash; TechQuest 2026</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0a0c12;
+      --surface:   #10131e;
+      --border:    #1b2035;
+      --accent:    #c088ff;   /* purple — robotics / fun games */
+      --accent2:   #818cf8;
+      --text:      #e2e8f0;
+      --muted:     #64748b;
+      --chip-bg:   #141828;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    /* ── nav ── */
+    nav {
+      position: sticky; top: 0; z-index: 50;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; height: 60px;
+      background: rgba(10,12,18,.88);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { font-size: 1.25rem; font-weight: 700; color: var(--text); text-decoration: none; }
+    .nav-logo span { color: var(--accent); }
+    .nav-links { list-style: none; display: flex; gap: 1.5rem; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: .9rem; transition: color .2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+
+    /* ── page wrap ── */
+    .detail-wrap {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 5rem;
+    }
+
+    /* ── back ── */
+    .back-btn {
+      display: inline-flex; align-items: center; gap: .4rem;
+      color: var(--muted); text-decoration: none; font-size: .85rem;
+      margin-bottom: 2rem; transition: color .2s;
+    }
+    .back-btn:hover { color: var(--accent); }
+
+    /* ── header ── */
+    .detail-header { margin-bottom: 1.5rem; }
+
+    .cat {
+      display: inline-block;
+      padding: .25rem .75rem;
+      border-radius: 999px;
+      font-size: .75rem; font-weight: 600;
+      letter-spacing: .05em; text-transform: uppercase;
+      margin-bottom: .75rem;
+    }
+    .cat-robot { background: rgba(192,136,255,.1); color: #c088ff; border: 1px solid rgba(192,136,255,.25); }
+
+    .detail-title {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 800; letter-spacing: -.02em; line-height: 1.1;
+      margin-bottom: .75rem;
+      background: linear-gradient(135deg, #e2e8f0 30%, var(--accent));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .detail-tagline { color: var(--muted); font-size: 1.05rem; max-width: 600px; }
+
+    /* ── meta chips ── */
+    .meta-row { display: flex; flex-wrap: wrap; gap: .6rem; margin-bottom: 2rem; }
+    .meta-chip {
+      display: flex; align-items: center; gap: .5rem;
+      background: var(--chip-bg); border: 1px solid var(--border);
+      border-radius: 8px; padding: .45rem .9rem;
+      font-size: .85rem; color: var(--text);
+    }
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+    .divider { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+
+    /* ── sections ── */
+    .ds { margin-bottom: 1.5rem; }
+    .ds-label {
+      font-size: .7rem; font-weight: 700; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 1rem;
+    }
+    .ds p { color: #94a3b8; margin-bottom: .75rem; }
+    .ds ul { padding-left: 1.2rem; }
+    .ds ul li { color: #94a3b8; margin-bottom: .4rem; }
+
+    /* ── round cards ── */
+    .round {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.25rem 1.5rem; margin-bottom: 1rem;
+    }
+    .round-lbl {
+      font-size: .7rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--accent2); margin-bottom: .3rem;
+    }
+    .round-name { font-size: 1.1rem; font-weight: 700; margin-bottom: .8rem; color: var(--text); }
+    .round-body p { color: #94a3b8; margin-bottom: .6rem; font-size: .95rem; }
+    .round-body ul { padding-left: 1.2rem; }
+    .round-body ul li { color: #94a3b8; margin-bottom: .35rem; font-size: .92rem; }
+
+    /* ── pre-event grid ── */
+    .pre-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; margin-top: .5rem; }
+    .pre-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.2rem; }
+    .pre-card-lbl { font-size: .68rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--accent2); margin-bottom: .4rem; }
+    .pre-card-val { color: #94a3b8; font-size: .9rem; }
+
+    /* ── scoring table ── */
+    .score-table { width: 100%; border-collapse: collapse; margin-top: .75rem; }
+    .score-table th, .score-table td { text-align: left; padding: .6rem .9rem; font-size: .9rem; border-bottom: 1px solid var(--border); }
+    .score-table th { color: var(--accent); font-weight: 600; font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; }
+    .score-table td { color: #94a3b8; }
+    .score-table tr:last-child td { border-bottom: none; }
+
+    /* ── host grid ── */
+    .host-grid { display: flex; flex-direction: column; gap: .75rem; }
+    .host-item {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: .9rem 1.2rem;
+      font-size: .95rem; color: var(--text);
+      display: flex; align-items: center; gap: .75rem;
+    }
+    .host-tag {
+      display: inline-block;
+      background: rgba(192,136,255,.1); color: var(--accent);
+      border: 1px solid rgba(192,136,255,.25);
+      border-radius: 6px; font-size: .7rem; font-weight: 700;
+      letter-spacing: .06em; text-transform: uppercase;
+      padding: .2rem .55rem; white-space: nowrap;
+    }
+
+    footer {
+      text-align: center; padding: 2rem 1rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted); font-size: .85rem;
+    }
+    .footer-logo { font-size: 1rem; font-weight: 700; margin-bottom: .3rem; }
+    .footer-logo span { color: var(--accent); }
+
+    #topBtn {
+      position: fixed; bottom: 1.5rem; right: 1.5rem;
+      background: var(--accent); color: #000;
+      width: 38px; height: 38px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      text-decoration: none; font-size: 1rem;
+      opacity: .8; transition: opacity .2s;
+    }
+    #topBtn:hover { opacity: 1; }
+
+    @media (max-width: 600px) {
+      nav { padding: 0 1rem; }
+      .detail-wrap { padding: 1.5rem 1rem 4rem; }
+      .pre-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="../index.html" class="nav-logo">Tech<span>Quest</span></a>
+  <ul class="nav-links">
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="../index.html#about">About</a></li>
+    <li><a href="../index.html#events" class="active">Events</a></li>
+  </ul>
+</nav>
+
+<div class="detail-wrap">
+
+  <a href="../index.html#events" class="back-btn">&larr; Back to Events</a>
+
+  <!-- HEADER -->
+  <div class="detail-header">
+    <span class="cat cat-robot">Fun Games</span>
+    <h1 class="detail-title">Robot Snooze</h1>
+    <p class="detail-tagline">
+      One commands. One obeys. Chaos begins. &mdash; A blindfolded teamwork
+      challenge where the only tool is your voice.
+    </p>
+  </div>
+
+  <!-- META -->
+  <div class="meta-row">
+    <div class="meta-chip"><span class="dot"></span><b>Type:</b>&nbsp;Physical Activity</div>
+    <div class="meta-chip"><span class="dot"></span><b>Mode:</b>&nbsp;Team</div>
+    <div class="meta-chip"><span class="dot"></span><b>Duration:</b>&nbsp;5 Hours</div>
+    <div class="meta-chip"><span class="dot"></span><b>Max Teams:</b>&nbsp;15</div>
+    <div class="meta-chip"><span class="dot"></span><b>Open To:</b>&nbsp;Classes 5&ndash;8</div>
+    <div class="meta-chip"><span class="dot"></span><b>Venue:</b>&nbsp;School Ground</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- OVERVIEW -->
+  <div class="ds">
+    <div class="ds-label">Overview</div>
+    <p>
+      Robot Snooze is a fun, team-based physical challenge where one player acts as
+      the <b>Controller</b> and the other plays the <b>Robot</b> — blindfolded and
+      following only verbal instructions to complete tasks on the school ground.
+    </p>
+    <p>
+      Teams must rely entirely on clear communication and coordination. Physical
+      contact, gestures, and non-verbal cues are all banned. Only your words can
+      guide your robot.
+    </p>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- PRE-EVENT -->
+  <div class="ds">
+    <div class="ds-label">Pre-Event &mdash; Selection Round</div>
+    <div class="pre-grid">
+      <div class="pre-card">
+        <div class="pre-card-lbl">When</div>
+        <div class="pre-card-val">2&ndash;3 weeks after registration closes</div>
+      </div>
+      <div class="pre-card">
+        <div class="pre-card-lbl">Format</div>
+        <div class="pre-card-val">Coordination-oriented physical activity</div>
+      </div>
+      <div class="pre-card">
+        <div class="pre-card-lbl">Duration</div>
+        <div class="pre-card-val">3 hours</div>
+      </div>
+      <div class="pre-card">
+        <div class="pre-card-lbl">Judging Basis</div>
+        <div class="pre-card-val">Speed + coordination</div>
+      </div>
+      <div class="pre-card">
+        <div class="pre-card-lbl">Who Proceeds</div>
+        <div class="pre-card-val">Top 15 teams</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- EVENT STRUCTURE -->
+  <div class="ds">
+    <div class="ds-label">Event Structure</div>
+
+    <div class="round">
+      <div class="round-lbl">Final Showdown &mdash; 5 Hours</div>
+      <div class="round-name">Robot Snooze — Final Challenge</div>
+      <div class="round-body">
+        <p>
+          One team member is blindfolded — the <b>Robot</b>. The other is the
+          <b>Controller</b>, who must guide the Robot through a series of tasks
+          using only verbal instructions. Teams are scored on how well they
+          communicate, how precisely the Robot executes, and how efficiently they
+          complete the challenge.
+        </p>
+        <ul>
+          <li>Only <b>verbal instructions</b> are allowed from the Controller</li>
+          <li>The Robot must remain blindfolded at all times during the round</li>
+          <li>No physical contact, gestures, or non-verbal signals permitted</li>
+          <li>Teams must stay within the defined activity area on the school ground</li>
+          <li>Safe and controlled movement is required at all times</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- JUDGING -->
+  <div class="ds">
+    <div class="ds-label">Judging &amp; Scoring</div>
+    <table class="score-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Criterion</th>
+          <th>Marks</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>Coordination &amp; Teamwork</td><td>20</td></tr>
+        <tr><td>2</td><td>Control &amp; Precision</td><td>10</td></tr>
+        <tr><td>3</td><td>Time Efficiency</td><td>10</td></tr>
+        <tr><td>4</td><td>Communication Clarity</td><td>10</td></tr>
+        <tr><td></td><td><b>Total</b></td><td><b>50</b></td></tr>
+      </tbody>
+    </table>
+    <p style="color:var(--muted);font-size:.85rem;margin-top:.75rem;">
+      <b>Tiebreaker:</b> The team that completes the task in the least time ranks
+      higher. If still tied, priority goes to better communication and coordination
+      between participants.
+    </p>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- RULES -->
+  <div class="ds">
+    <div class="ds-label">Rules &amp; Guidelines</div>
+    <div class="round">
+      <div class="round-name">Allowed</div>
+      <div class="round-body">
+        <ul>
+          <li>Verbal communication between the Controller and the Robot</li>
+          <li>Clear and strategic instructions within the given limits</li>
+          <li>Team coordination and planning <em>before</em> the round starts</li>
+          <li>Safe and controlled movement within the defined area</li>
+        </ul>
+      </div>
+    </div>
+    <div class="round">
+      <div class="round-name">Not Allowed</div>
+      <div class="round-body">
+        <ul>
+          <li>The Robot removing the blindfold during the round</li>
+          <li>Physical guidance &mdash; touching, holding, or pushing the Robot</li>
+          <li>Use of gestures or signals other than verbal instructions</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- HOSTS -->
+  <div class="ds">
+    <div class="ds-label">Event Hosts</div>
+    <div class="host-grid">
+      <div class="host-item">
+        <span class="host-tag">Host</span>
+        Aashi Mishra &mdash; Class XII-C
+      </div>
+      <div class="host-item">
+        <span class="host-tag">Host</span>
+        Ishant Chauhan &mdash; Class XII-B
+      </div>
+    </div>
+  </div>
+
+</div><!-- /detail-wrap -->
+
+<footer>
+  <div class="footer-logo">Tech<span>Quest</span></div>
+  <div>&copy; 2026 TechQuest Committee &mdash; All rights reserved</div>
+</footer>
+
+<a href="#" id="topBtn">&uarr;</a>
+
+</body>
+</html>
