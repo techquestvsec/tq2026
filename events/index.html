@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TechQuest 2026</title>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    /* ── INDEX-ONLY STYLES ── */
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction:column;
+      justify-content:center; align-items:center;
+      position: relative; overflow:hidden;
+      padding: 80px 5vw 40px;
+    }
+    #starCanvas { position:absolute; inset:0; z-index:0; }
+    .hero-grid {
+      position:absolute; inset:0; z-index:1;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 80px 80px;
+      mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 20%, transparent 80%);
+    }
+    .hero-content { position:relative; z-index:2; text-align:center; max-width:700px; }
+    .hero-eyebrow {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: .72em; font-weight:500; letter-spacing:3px; text-transform:uppercase;
+      color: var(--cyan); margin-bottom:1.4em;
+      display: flex; align-items:center; justify-content:center; gap:10px;
+    }
+    .hero-eyebrow::before, .hero-eyebrow::after {
+      content:''; flex:1; max-width:60px; height:1px;
+      background: linear-gradient(90deg, transparent, var(--cyan));
+    }
+    .hero-eyebrow::after { transform:scaleX(-1); }
+    .hero-title {
+      font-family: 'Syne', sans-serif; font-weight:800;
+      font-size: clamp(3em, 8vw, 6.5em); line-height:.95;
+      color:#fff; letter-spacing:-2px; margin-bottom:.25em;
+    }
+    .hero-title .t-gold { color:var(--gold); }
+    .hero-year {
+      display:block;
+      font-family: 'IBM Plex Mono', monospace; font-weight:400;
+      font-size: clamp(.85em, 1.8vw, 1.1em); letter-spacing:8px;
+      color: var(--muted); margin-bottom:1.2em;
+    }
+    .hero-desc {
+      font-size: .95em; color:var(--muted); line-height:1.7;
+      max-width:460px; margin:0 auto 2em; font-weight:300;
+    }
+    .hero-actions { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+    .hero-scroll {
+      position:absolute; bottom:2.2em; left:50%; transform:translateX(-50%);
+      z-index:2; display:flex; flex-direction:column; align-items:center; gap:6px;
+      color:var(--muted); font-family:'IBM Plex Mono',monospace;
+      font-size:.62em; letter-spacing:2px;
+    }
+    .scroll-tick {
+      width:1px; height:32px;
+      background: linear-gradient(to bottom, var(--muted), transparent);
+      animation: tick 2s ease-in-out infinite;
+    }
+    @keyframes tick { 0%,100%{opacity:.3;transform:scaleY(.7)} 50%{opacity:1;transform:scaleY(1)} }
+
+    /* ABOUT GRID */
+    .about-grid {
+      display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr));
+      gap:1px; background:var(--border);
+      border:1px solid var(--border); border-radius:8px; overflow:hidden;
+      margin-bottom:1px;
+    }
+    .about-cell {
+      background:var(--surface); padding:1.8em;
+      transition:background .2s;
+    }
+    .about-cell:hover { background:var(--surface2); }
+    .cell-label {
+      font-family:'IBM Plex Mono',monospace; font-size:.62em;
+      letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-bottom:.6em;
+    }
+    .cell-title { font-family:'Syne',sans-serif; font-weight:700; font-size:1em; color:#fff; margin-bottom:.55em; }
+    .cell-body  { font-size:.83em; color:var(--muted); line-height:1.75; }
+    .cell-body ul { list-style:none; margin-top:.6em; }
+    .cell-body li { padding:.2em 0 .2em 1em; position:relative; }
+    .cell-body li::before { content:'›'; position:absolute; left:0; color:var(--cyan); }
+    .date-chip {
+      display:inline-block; margin-top:1em;
+      font-family:'IBM Plex Mono',monospace; font-size:.8em; font-weight:700;
+      padding:7px 14px; border-radius:3px;
+      background:var(--gold-dim); color:var(--gold); border:1px solid var(--gold-bdr);
+      letter-spacing:1px;
+    }
+    .stat-row {
+      display:grid; grid-template-columns:repeat(4,1fr);
+      gap:1px; background:var(--border);
+      border:1px solid var(--border); border-radius:8px; overflow:hidden; margin-top:1px;
+    }
+    .stat-cell { background:var(--surface); padding:1.4em; text-align:center; }
+    .stat-num  { font-family:'IBM Plex Mono',monospace; font-size:1.9em; font-weight:700; color:var(--gold); }
+    .stat-lbl  { font-size:.65em; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-top:.3em; }
+
+    /* EVENTS */
+    .filter-bar { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:2em; }
+    .ftag {
+      font-family:'IBM Plex Mono',monospace; font-size:.68em; font-weight:500;
+      letter-spacing:1px; text-transform:uppercase;
+      padding:5px 13px; border-radius:3px;
+      background:transparent; color:var(--muted);
+      border:1px solid var(--border); cursor:pointer; transition:all .18s;
+    }
+    .ftag:hover { color:var(--text); border-color:rgba(255,255,255,.15); }
+    .ftag.on    { background:var(--gold-dim); color:var(--gold); border-color:var(--gold-bdr); }
+
+    .events-grid {
+      display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+      gap:1px; background:var(--border);
+      border:1px solid var(--border); border-radius:8px; overflow:hidden;
+    }
+    .ecard {
+      background:var(--surface); padding:1.5em 1.7em;
+      cursor:pointer; transition:background .18s;
+      position:relative; overflow:hidden;
+      display:flex; flex-direction:column;
+    }
+    .ecard::before {
+      content:''; position:absolute; left:0; top:0; bottom:0; width:2px;
+      background:transparent; transition:background .2s;
+    }
+    .ecard:hover { background:var(--surface2); }
+    .ecard:hover::before { background:var(--gold); }
+    .ecard-top   { display:flex; align-items:flex-start; justify-content:space-between; gap:.8em; margin-bottom:.8em; }
+    .ecard-arrow { font-size:.75em; color:var(--muted); transition:color .2s; margin-top:.1em; flex-shrink:0; }
+    .ecard:hover .ecard-arrow { color:var(--gold); }
+    .ecard-name  { font-family:'Syne',sans-serif; font-weight:700; font-size:1.02em; color:#fff; margin-bottom:.45em; }
+    .ecard-desc  { font-size:.82em; color:var(--muted); line-height:1.65; flex:1; }
+    .ecard-link  {
+      display:inline-flex; align-items:center; gap:6px;
+      margin-top:1.1em; align-self:flex-start;
+      font-family:'IBM Plex Mono',monospace; font-size:.68em; font-weight:500;
+      letter-spacing:1px; text-transform:uppercase;
+      padding:5px 12px; border-radius:3px;
+      color:var(--muted); border:1px solid var(--border);
+      text-decoration:none; transition:all .18s;
+    }
+    .ecard-link:hover { color:var(--gold); border-color:var(--gold-bdr); background:var(--gold-dim); }
+    .ecard-link .arr { transition:transform .18s; }
+    .ecard-link:hover .arr { transform:translateX(3px); }
+
+    @media (max-width:768px) {
+      .stat-row { grid-template-columns:repeat(2,1fr); }
+      .about-grid { grid-template-columns:1fr; }
+      .events-grid { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">Tech<span>Quest</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html" class="active">Home</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#events">Events</a></li>
+  </ul>
+</nav>
+
+<!-- ══ HERO ══ -->
+<section class="hero">
+  <canvas id="starCanvas"></canvas>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">Annual Tech Festival</div>
+    <h1 class="hero-title">Tech<span class="t-gold">Quest</span></h1>
+    <span class="hero-year">2 0 2 5</span>
+    <p class="hero-desc">Compete. Build. Debug. Animate. Speak. Win.<br>The school's biggest convergence of technology and creativity.</p>
+    <div class="hero-actions">
+      <a href="#events" class="btn btn-gold">View Events</a>
+      <a href="#about" class="btn btn-ghost">Learn More</a>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <div class="scroll-tick"></div>
+    <span>SCROLL</span>
+  </div>
+</section>
+
+<!-- ══ ABOUT ══ -->
+<section class="section" id="about">
+  <div class="section-inner">
+    <div class="section-label">About</div>
+    <h2 class="section-title">What is <span class="hl">TechQuest?</span></h2>
+    <div class="title-rule"></div>
+
+    <div class="about-grid">
+      <div class="about-cell">
+        <div class="cell-label">Overview</div>
+        <div class="cell-title">A Festival of Innovation</div>
+        <div class="cell-body">
+          TechQuest 2026 is the school's annual convergence of creativity and technology — spanning coding, robotics, animation, digital arts, gaming, and public speaking.
+          <ul>
+            <li>Open to Classes 9–12</li>
+            <li>Team &amp; solo participation</li>
+            <li>Competitions + workshops</li>
+            <li>Judged by the TechQuest Committee</li>
+          </ul>
+        </div>
+      </div>
+      <div class="about-cell">
+        <div class="cell-label">Rules</div>
+        <div class="cell-title">Important Notes</div>
+        <div class="cell-body">
+          <ul>
+            <li>Ensure your events don't clash</li>
+            <li>Results are final and unchallengeable</li>
+            <li>All events allow individual participation unless stated otherwise</li>
+            <li>Selection is first-come, first-served</li>
+            <li>No preliminary rounds unless specified</li>
+          </ul>
+        </div>
+      </div>
+      <div class="about-cell">
+        <div class="cell-label">Participation</div>
+        <div class="cell-title">How to Register</div>
+        <div class="cell-body">
+          <ul>
+            <li>Inform your computer teacher</li>
+            <li>Contact the event head directly</li>
+            <li>Meet them during class visits</li>
+          </ul>
+        </div>
+      </div>
+      <div class="about-cell">
+        <div class="cell-label">Schedule</div>
+        <div class="cell-title">Grand Finale</div>
+        <div class="cell-body">
+          Your event head will train and guide you right up until the finale.
+          <div class="date-chip">26 – 30 AUG 2026</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-cell"><div class="stat-num">20+</div><div class="stat-lbl">Events</div></div>
+      <div class="stat-cell"><div class="stat-num">9–12</div><div class="stat-lbl">Classes</div></div>
+      <div class="stat-cell"><div class="stat-num">5</div><div class="stat-lbl">Days</div></div>
+      <div class="stat-cell"><div class="stat-num">∞</div><div class="stat-lbl">Potential</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ EVENTS ══ -->
+<section class="section" id="events" style="padding-top:40px;">
+  <div class="section-inner">
+    <div class="section-label">Lineup</div>
+    <h2 class="section-title">Events <span class="hl">Lineup</span></h2>
+    <div class="title-rule"></div>
+
+    <div class="filter-bar" id="filterBar">
+      <button class="ftag on" data-f="all">All</button>
+      <button class="ftag" data-f="speak">Public Speaking</button>
+      <button class="ftag" data-f="code">Coding</button>
+      <button class="ftag" data-f="media">Media &amp; Arts</button>
+      <button class="ftag" data-f="gaming">Gaming</button>
+      <button class="ftag" data-f="robot">Robotics</button>
+      <button class="ftag" data-f="design">Design</button>
+    </div>
+
+    <div class="events-grid" id="eventsGrid">
+
+      <!-- PUBLIC SPEAKING -->
+      <div class="ecard" data-cat="speak">
+        <div class="ecard-top">
+          <span class="cat cat-speak">Public Speaking</span>
+          <span class="ecard-arrow">›</span>
+        </div>
+        <div class="ecard-name">Debate</div>
+        <div class="ecard-desc">Parliamentary-style debate — research your stance, deliver structured speeches across four sessions, and handle a live crisis round.</div>
+        <a href="events/debate.html" class="ecard-link">Full Details <span class="arr">→</span></a>
+      </div>
+
+      <div class="ecard" data-cat="speak">
+        <div class="ecard-top">
+          <span class="cat cat-speak">Public Speaking</span>
+          <span class="ecard-arrow">›</span>
+        </div>
+        <div class="ecard-name">Ham The Jam</div>
+        <div class="ecard-desc">Pick a chit, speak on the spot — survive 30 sec in HAM and 60 sec in JAM while fending off live interjections from competitors.</div>
+        <a href="events/hamthejam.html" class="ecard-link">Full Details <span class="arr">→</span></a>
+      </div>
+
+      <div class="ecard" data-cat="speak">
+        <div class="ecard-top">
+          <span class="cat cat-speak">Public Speaking</span>
+          <span class="ecard-arrow">›</span>
+        </div>
+        <div class="ecard-name">Do DubDub</div>
+        <div class="ecard-desc">Watch a silent video, write a script in 7 minutes, then dub it live — sync, voice modulation, and humour decide the winner.</div>
+        <a href="events/dubdub.html" class="ecard-link">Full Details <span class="arr">→</span></a>
+      </div>
+
+      <!-- CODING -->
+      <div class="ecard" data-cat="code">
+        <div class="ecard-top">
+          <span class="cat cat-code">Coding</span>
+          <span class="ecard-arrow">›</span>
+        </div>
+        <div class="ecard-name">Algorithm Making</div>
+        <div class="ecard-desc">Pair up and architect a Java algorithm from scratch — 1.5h to draft on paper, 2.5h to implement and submit.</div>
+        <a href="events/algorithm.html" class="ecard-link">Full Details <span class="arr">→</span></a>
+      </div>
+
+      <div class="ecard" data-cat="code">
+        <div class="ecard-top">
+          <span class="cat cat-code">Coding</span>
+          <span class="ecard-arrow">›</span>
+        </div>
+        <div class="ecard-name">Codezilla</div>
+        <div class="ecard-desc">Individual Java programming — develop complete programs from a rough draft to final submission across two timed sessions.</div>
+        <a href="events/codezilla.html" class="ecard-link">Full Details <span class="arr">→</span></a>
+      </div>
+
+      <div class="ecard" data-cat="code">
+        <div class="ecard-top">
+          <span class="cat cat-code">Coding</span>
+          <span class="ecard-arrow">›</span>
+        </div>
+        <div class="ecard-name">Kill The Bug</div>
+        <div class="ecard-desc">20 Java code snippets riddled with syntax, runtime, and logic errors — 4 hours to hunt and squash every bug.</div>
+        <a href="events/killthebug.html" class="ecard-link">Full Details <span class="arr">→</span></a>
+      </div>
+
+      <div class="ecard" data-cat="code">
+        <div class="ecard-top">
+          <span class="cat cat-code">Coding</span>
+          <span class="ecard-arrow">›</span>
+        </div>
+        <div class="ecard-name">From The Scratch</div>
+        <div class="ecard-desc">Build a game or animated story using Scratch 2 / Scratch 3 — logic, creativity, and code quality are all judged.</div>
+        <a href="events/scratch.html" class="ecard-link">Full Details <span class="arr">→</span></a>
+      </div>
+
+      <!-- ROBOTICS -->
+      <div class="ecard" data-cat="robot">
+        <div class="ecard-top">
+          <span class="cat cat-robot">Robotics</span>
+          <span class="ecard-arrow">›</span>
+        </div>
+        <div class="ecard-name">MechaTron</div>
+        <div class="ecard-desc">Build your robot and choose your arena — Fight (destroy the opponent) or Race (beat the clock). Engineering and control skill both count.</div>
+        <a href="events/mechatron.html" class="ecard-link">Full Details <span class="arr">→</span></a>
+      </div>
+
+      <!-- MEDIA & ARTS -->
+      <div class="ecard" data-cat="media">
+        <div class="ecard-top">
+          <span class="cat cat-media">Media &amp; Arts</span>
+          <span class="ecard-arrow">›</span>
+        </div>
+        <div class="ecard-name">Cinematic Cuts</div>
+        <div class="ecard-desc">Write, direct, act, and edit a short film. Topics given a week ahead — showcase every stage of the filmmaking pipeline.</div>
+        <a href="events/cinematic.html" class="ecard-link">Full Details <span class="arr">→</span></a>
+      </div>
+
+      <div class="ecard" data-cat="media">
+        <div class="ecard-top">
+          <span class="cat cat-media">Media &amp; Arts</span>
+          <span class="ecard-arrow">›</span>
+        </div>
+        <div class="ecard-name">Beat D Beats</div>
+        <div class="ecard-desc">Remix and mash-up provided audio tracks using Audacity, FL Studio, or Acid Pro into a polished, original composition.</div>
+        <a href="events/beatdbeats.html" class="ecard-link">Full Details <span class="arr">→</span></a>
+      </div>
+
+      <div class="ecard" data-cat="media">
+        <div class="ecard-top">
+          <span class="cat cat-media">Media &amp; Arts</span>
+          <span class="ecard-arrow">›</span>
+        </div>
+        <div class="ecard-name">Frame D Flash</div>
+        <div class="ecard-desc">Create a 2D animation in Macromedia Flash 8 — topic revealed on event day, judged on timing, smoothness, and creativity.</div>
+        <a href="events/framedflash.html" class="ecard-link">Full Details <span class="arr">→</span></a>
+      </div>
+
+      <div class="ecard" data-cat="media">
+        <div class="ecard-top">
+          <span class="cat cat-media">Media &amp; Arts</span>
+          <span class="ecard-arrow">›</span>
+        </div>
+        <div class="ecard-name">Lead The Stick</div>
+        <div class="ecard-desc">Animate stick figures in Pivot — fluid movement, compelling narrative, and technical precision are what the judges want to see.</div>
+        <a href="events/leadthestick.html" class="ecard-link">Full Details <span class="arr">→</span></a>
+      </div>
+
+      <div class="ecard" data-cat="media">
+        <div class="ecard-top">
+          <span class="cat cat-media">Media &amp; Arts</span>
+          <span class="ecard-arrow">›</span>
+        </div>
+        <div class="ecard-name">DigiClay</div>
+        <div class="ecard-desc">Model and animate an original 3D sequence in Blender — realism, originality, and technical rigging all factor into the score.</div>
+        <a href="events/digiclay.html" class="ecard-link">Full Details <span class="arr">→</span></a>
+      </div>
+
+      <!-- DESIGN -->
+      <div class="ecard" data-cat="design">
+        <div class="ecard-top">
+          <span class="cat cat-design">Design</span>
+          <span class="ecard-arrow">›</span>
+        </div>
+        <div class="ecard-name">PixBit</div>
+        <div class="ecard-desc">Transform stock images into digital art using any photo editing tool — topic and source images provided on the day.</div>
+        <a href="events/pixbit.html" class="ecard-link">Full Details <span class="arr">→</span></a>
+      </div>
+
+      <div class="ecard" data-cat="design">
+        <div class="ecard-top">
+          <span class="cat cat-design">Design</span>
+          <span class="ecard-arrow">›</span>
+        </div>
+        <div class="ecard-name">Pixelated</div>
+        <div class="ecard-desc">Recreate a given image using only ASCII characters in Notepad — precision, creativity, and resemblance are scored in 1.5 hours.</div>
+        <a href="events/pixelated.html" class="ecard-link">Full Details <span class="arr">→</span></a>
+      </div>
+
+      <div class="ecard" data-cat="design">
+        <div class="ecard-top">
+          <span class="cat cat-design">Design</span>
+          <span class="ecard-arrow">›</span>
+        </div>
+        <div class="ecard-name">Slide Master</div>
+        <div class="ecard-desc">Design a PowerPoint presentation on a given topic in under an hour — judged on layout, clarity, relevance, and delivery.</div>
+        <a href="events/slidemaster.html" class="ecard-link">Full Details <span class="arr">→</span></a>
+      </div>
+
+      <div class="ecard" data-cat="design">
+        <div class="ecard-top">
+          <span class="cat cat-design">Design</span>
+          <span class="ecard-arrow">›</span>
+        </div>
+        <div class="ecard-name">Weave The Web</div>
+        <div class="ecard-desc">Build a website from scratch using only HTML and CSS — no scripting allowed. Topic and assets provided on the day.</div>
+        <a href="events/weavetheweb.html" class="ecard-link">Full Details <span class="arr">→</span></a>
+      </div>
+
+      <!-- GAMING -->
+      <div class="ecard" data-cat="gaming">
+        <div class="ecard-top">
+          <span class="cat cat-gaming">Gaming</span>
+          <span class="ecard-arrow">›</span>
+        </div>
+        <div class="ecard-name">OpTic Fnatics</div>
+        <div class="ecard-desc">Two-day Minecraft tournament — Day 1: Build Battle (redstone + aesthetic), Day 2: Manhunt. Last builder standing wins.</div>
+        <a href="events/opticfnatics.html" class="ecard-link">Full Details <span class="arr">→</span></a>
+      </div>
+
+      <div class="ecard" data-cat="gaming">
+        <div class="ecard-top">
+          <span class="cat cat-gaming">Gaming</span>
+          <span class="ecard-arrow">›</span>
+        </div>
+        <div class="ecard-name">Tech Quiz</div>
+        <div class="ecard-desc">Two-round tech trivia — written MCQ exam followed by a live buzzer showdown with rapid fire, picture puzzles, and Tech Taboo.</div>
+        <a href="events/techquiz.html" class="ecard-link">Full Details <span class="arr">→</span></a>
+      </div>
+
+      <div class="ecard" data-cat="gaming">
+        <div class="ecard-top">
+          <span class="cat cat-gaming">Gaming</span>
+          <span class="ecard-arrow">›</span>
+        </div>
+        <div class="ecard-name">Scavenger Hunt</div>
+        <div class="ecard-desc">A hybrid digital-physical quest — solve layered clues, complete challenges, and race against the clock solo or as a team.</div>
+        <a href="events/scavenger.html" class="ecard-link">Full Details <span class="arr">→</span></a>
+      </div>
+
+    </div><!-- /events-grid -->
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">TechQuest</div>
+  <div class="footer-copy">© 2026 TechQuest Committee — All rights reserved</div>
+</footer>
+
+<a href="#" id="topBtn">↑</a>
+<script src="shared.js"></script>
+<script>
+  // Filter tabs
+  document.getElementById('filterBar').addEventListener('click', e => {
+    const btn = e.target.closest('.ftag');
+    if (!btn) return;
+    document.querySelectorAll('.ftag').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    const f = btn.dataset.f;
+    document.querySelectorAll('.ecard').forEach(card => {
+      card.style.display = (f === 'all' || card.dataset.cat === f) ? '' : 'none';
+    });
+  });
+</script>
+</body>
+</html>
