@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TechQuest 2026 – Student Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #050a0f;
+  --surface: #0d1820;
+  --surface2: #132030;
+  --accent: #00e5ff;
+  --accent2: #ff6b35;
+  --green: #00ff9d;
+  --red: #e05c6b;
+  --text: #c8dde8;
+  --muted: #4a6275;
+  --border: rgba(0,229,255,0.15);
+  --border-hover: rgba(0,229,255,0.5);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ── LOGIN ── */
+#loginScreen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(0,229,255,0.07) 0%, transparent 60%);
+}
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 44px 40px;
+  box-shadow: 0 0 60px rgba(0,229,255,0.12), 0 0 120px rgba(0,229,255,0.04);
+  animation: fadeUp 0.5s ease;
+}
+@keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+.login-logo { text-align: center; margin-bottom: 36px; }
+.login-logo .logo-text {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 26px;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--accent), #0099bb);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 4px;
+}
+.login-logo .logo-sub { font-size: 11px; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; margin-top: 6px; }
+.login-logo .logo-year {
+  display: inline-block;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 11px;
+  color: var(--accent2);
+  border: 1px solid var(--accent2);
+  border-radius: 4px;
+  padding: 2px 8px;
+  margin-top: 8px;
+  letter-spacing: 2px;
+}
+.form-group { margin-bottom: 18px; }
+.form-group label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 8px; }
+.form-group input {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid rgba(0,229,255,0.1);
+  border-radius: 8px;
+  padding: 13px 16px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  outline: none;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+.form-group input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,229,255,0.1); }
+.form-group input::placeholder { color: var(--muted); }
+input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.5) sepia(1) hue-rotate(170deg); }
+.btn-login {
+  width: 100%;
+  background: var(--accent);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  padding: 14px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 8px;
+}
+.btn-login:hover { background: #33ecff; box-shadow: 0 0 20px rgba(0,229,255,0.4); transform: translateY(-1px); }
+.btn-login:active { transform: translateY(0); }
+.btn-login:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+.error-msg { color: var(--red); font-size: 13px; margin-top: 12px; text-align: center; display: none; }
+
+/* ── HEADER ── */
+#header {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 60px;
+  background: rgba(5,10,15,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  z-index: 100;
+  padding: 0 28px;
+  align-items: center;
+  justify-content: space-between;
+}
+#header.visible { display: flex; }
+.header-logo {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 3px;
+  cursor: pointer;
+}
+.header-right { display: flex; align-items: center; gap: 12px; }
+.student-badge { font-size: 12px; color: var(--muted); }
+.student-badge span { color: var(--text); font-weight: 600; }
+.btn-refresh {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid rgba(0,229,255,0.3);
+  border-radius: 6px;
+  padding: 7px 11px;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-refresh:hover { background: rgba(0,229,255,0.08); border-color: var(--accent); }
+.btn-refresh:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-refresh.spinning { animation: spin 0.7s linear infinite; }
+.btn-logout {
+  background: transparent;
+  color: var(--red);
+  border: 1px solid rgba(224,92,107,0.4);
+  border-radius: 6px;
+  padding: 7px 14px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-logout:hover { background: rgba(224,92,107,0.1); border-color: var(--red); }
+
+/* ── DASHBOARD ── */
+#dashboard {
+  display: none;
+  padding-top: 80px;
+  padding-bottom: 60px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+#dashboard.visible { display: block; }
+
+.hero {
+  text-align: center;
+  padding: 48px 20px 40px;
+  position: relative;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 200px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+}
+.hero-greeting {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(28px, 5vw, 48px);
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--accent) 0%, #ffffff 60%, var(--accent2) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 2px;
+  line-height: 1.2;
+  margin-bottom: 16px;
+}
+.hero-info { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; margin-top: 16px; }
+.info-chip {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.info-chip span { color: var(--accent); font-weight: 600; }
+
+.section-heading {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin: 40px 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.section-heading::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--border), transparent);
+}
+.section-heading-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 40px 0 20px;
+}
+.section-heading-row .section-heading { margin: 0; flex: 1; }
+.section-heading-row .section-heading::after { display: none; }
+.btn-notice {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: transparent;
+  color: var(--accent2);
+  border: 1px solid rgba(255,107,53,0.45);
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+.btn-notice:hover { background: rgba(255,107,53,0.1); border-color: var(--accent2); box-shadow: 0 0 14px rgba(255,107,53,0.25); transform: translateY(-1px); }
+
+/* ── EVENTS GRID ── */
+.events-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+}
+.event-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  cursor: default;
+  transition: all 0.25s;
+  position: relative;
+  overflow: hidden;
+}
+.event-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.event-card:hover { border-color: var(--border-hover); background: #0f1e2a; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+.event-card:hover::before { opacity: 1; }
+.event-name {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+.btn-apply {
+  width: 100%;
+  background: var(--green);
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  padding: 9px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-apply:hover:not(:disabled) { box-shadow: 0 0 16px rgba(0,255,157,0.4); transform: translateY(-1px); }
+.btn-apply:disabled { background: var(--surface2); color: var(--muted); cursor: not-allowed; transform: none; box-shadow: none; }
+.event-status { font-size: 11px; margin-top: 10px; color: var(--muted); text-align: center; }
+.event-status.applied { color: var(--green); font-weight: 600; }
+
+/* ── RESULTS GRID ── */
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+}
+.result-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.25s;
+  position: relative;
+  overflow: hidden;
+}
+.result-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent2), transparent);
+}
+.result-card:hover { border-color: rgba(255,107,53,0.3); transform: translateY(-2px); }
+.result-event-name {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 14px;
+}
+.result-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.result-label { font-size: 12px; color: var(--muted); }
+.badge { background: var(--green); color: #000; padding: 3px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; }
+.badge.rank { background: var(--accent2); }
+.selection-banner { margin-bottom: 14px; padding: 10px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.selection-banner.selected  { background: rgba(0,255,157,0.08);   border: 1px solid rgba(0,255,157,0.3);   color: var(--green); }
+.selection-banner.not-selected { background: rgba(224,92,107,0.08); border: 1px solid rgba(224,92,107,0.2); color: var(--red); }
+.selection-banner.pending   { background: rgba(255,107,53,0.08);  border: 1px solid rgba(255,107,53,0.2);  color: var(--accent2); }
+
+/* ── REFRESH HINT ── */
+.refresh-hint {
+  text-align: center;
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 16px;
+  padding: 10px;
+  border: 1px dashed rgba(0,229,255,0.1);
+  border-radius: 8px;
+}
+.refresh-hint span { color: var(--accent); }
+
+/* ── EMPTY / LOADING ── */
+.empty-state { grid-column: 1/-1; text-align: center; padding: 48px 20px; color: var(--muted); font-size: 14px; }
+.empty-state .empty-icon { font-size: 36px; display: block; margin-bottom: 12px; }
+.loading-wrap { grid-column: 1/-1; display: flex; justify-content: center; padding: 40px; }
+.spinner { width: 32px; height: 32px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── TOAST ── */
+#toastContainer { position: fixed; bottom: 24px; right: 24px; z-index: 9998; display: flex; flex-direction: column; gap: 10px; }
+.toast { background: var(--surface); border-radius: 8px; padding: 12px 18px; font-size: 13px; min-width: 220px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); animation: slideUp 0.3s ease forwards; display: flex; align-items: center; gap: 10px; }
+.toast.success { border: 1px solid rgba(0,255,157,0.4); color: var(--green); }
+.toast.error   { border: 1px solid rgba(224,92,107,0.4); color: var(--red); }
+@keyframes slideUp   { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+@keyframes slideDown { from { opacity:1; transform:translateY(0); } to { opacity:0; transform:translateY(20px); } }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .login-card { padding: 28px 20px; margin: 12px; }
+  .login-logo .logo-text { font-size: 22px; }
+  #header { padding: 0 14px; }
+  .student-badge { display: none !important; }
+  #dashboard { padding-top: 72px; padding-left: 14px; padding-right: 14px; padding-bottom: 40px; }
+  .hero { padding: 28px 10px 28px; }
+  .hero-greeting { font-size: 26px; }
+  .hero-info { gap: 10px; }
+  .info-chip { font-size: 11px; padding: 5px 10px; }
+  .section-heading { font-size: 11px; margin: 28px 0 14px; }
+  .events-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+  .results-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+  .event-card, .result-card { padding: 16px; }
+  .event-name { font-size: 11px; }
+  .btn-apply { font-size: 9px; padding: 8px; }
+  #toastContainer { bottom: 14px; right: 14px; left: 14px; }
+  .toast { min-width: unset; width: 100%; }
+}
+@media (max-width: 420px) {
+  .events-grid, .results-grid { grid-template-columns: 1fr 1fr; }
+  .hero-greeting { font-size: 22px; }
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="logo-text">TECHQUEST</div>
+      <div class="logo-sub">Student Portal</div>
+      <div class="logo-year">2026</div>
+    </div>
+    <div class="form-group">
+      <label for="scholarInput">Scholar Number</label>
+      <input type="text" id="scholarInput" placeholder="e.g. 10001" autocomplete="off">
+    </div>
+    <div class="form-group">
+      <label for="dobInput">Date of Birth</label>
+      <input type="date" id="dobInput">
+    </div>
+    <button class="btn-login" id="loginBtn" onclick="handleLogin()">LOGIN</button>
+    <div class="error-msg" id="loginError">Scholar Number or DOB incorrect</div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header id="header">
+  <span class="header-logo" onclick="location.reload()">TECHQUEST</span>
+  <div class="header-right">
+    <div class="student-badge" id="studentBadge">Logged in as <span id="studentName">—</span></div>
+    <button class="btn-refresh" id="refreshBtn" onclick="handleManualRefresh()" title="Refresh events & results">↺</button>
+    <button class="btn-logout" onclick="handleLogout()">Logout</button>
+  </div>
+</header>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+  <div class="hero">
+    <div class="hero-greeting">Welcome Back</div>
+    <div class="hero-info">
+      <div class="info-chip">Scholar: <span id="heroScholar">—</span></div>
+      <div class="info-chip">Class: <span id="heroClass">—</span></div>
+    </div>
+  </div>
+
+  <div class="section-heading-row">
+    <div class="section-heading" style="margin:0;flex:1">&#9889; All Events — Apply Here</div>
+    <a href="notice.html" class="btn-notice">&#128276; Notices</a>
+  </div>
+  <div class="events-grid" id="eventsGrid">
+    <div class="loading-wrap"><div class="spinner"></div></div>
+  </div>
+
+  <div class="section-heading">&#9989; Your Selection Status</div>
+  <div class="results-grid" id="selectionGrid">
+    <div class="loading-wrap"><div class="spinner"></div></div>
+  </div>
+
+  <div class="refresh-hint">
+    Results not updated? Hit the <span>↺</span> button in the header to refresh.
+  </div>
+</div>
+
+<div id="toastContainer"></div>
+
+<script>
+const API_URL = 'https://script.google.com/macros/s/AKfycbwocJsGoXNoWuPPjvz5e7rorhMXzEDHNdrYlkHvCVDQZPR_50s7N4uDD9J3SQlsrvjtig/exec';
+let currentStudent = null;
+
+// ── SESSION CHECK ──
+window.addEventListener('load', () => {
+  const stored = sessionStorage.getItem('tq_student');
+  if (stored) {
+    try {
+      currentStudent = JSON.parse(stored);
+      showDashboard();
+    } catch(e) { sessionStorage.removeItem('tq_student'); }
+  }
+});
+
+// ── DEVICE ID ──
+function getDeviceId() {
+  let id = localStorage.getItem('tq_device_id');
+  if (!id) {
+    id = 'dev_' + btoa(navigator.userAgent + screen.width + screen.height)
+      .replace(/[^a-zA-Z0-9]/g, '').substring(0, 24) + '_' + Date.now();
+    localStorage.setItem('tq_device_id', id);
+  }
+  return id;
+}
+
+// ── API HELPERS ──
+// READ calls use JSONP to bypass CORS (GAS doesn't send headers from a real origin).
+// WRITE calls use mode:'no-cors' fire-and-forget (opaque response is fine — we trust the lock).
+
+function fetchJSONP(url) {
+  return new Promise((resolve, reject) => {
+    const cbName = '_tqcb_' + Math.random().toString(36).slice(2);
+    const script = document.createElement('script');
+    script.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + cbName;
+    script.onerror = () => { delete window[cbName]; script.remove(); reject(new Error('JSONP failed')); };
+    window[cbName] = (data) => { delete window[cbName]; script.remove(); resolve(data); };
+    document.head.appendChild(script);
+  });
+}
+
+async function fetchAPI(url) {
+  try {
+    return await fetchJSONP(url);
+  } catch(e) {
+    // Fallback for local/null origin
+    try {
+      const res = await fetch(url, { redirect: 'follow' });
+      return JSON.parse(await res.text());
+    } catch(err) {
+      console.warn('fetchAPI error:', err);
+      return null;
+    }
+  }
+}
+
+async function fireWrite(params) {
+  // Fire-and-forget write — no-cors means response is opaque but request reaches GAS
+  const qs = new URLSearchParams(params).toString();
+  try {
+    await fetch(`${API_URL}?${qs}`, { method: 'GET', mode: 'no-cors' });
+  } catch(e) {
+    console.warn('fireWrite warning (usually safe):', e);
+  }
+}
+
+// ── LOGIN ──
+// Fetches only this student's profile — does NOT download the entire student list
+async function handleLogin() {
+  const scholar = document.getElementById('scholarInput').value.trim();
+  const dob     = document.getElementById('dobInput').value;
+  const btn     = document.getElementById('loginBtn');
+  const err     = document.getElementById('loginError');
+  err.style.display = 'none';
+
+  if (!scholar || !dob) { showErr('Please fill in both fields'); return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Logging in...';
+
+  const profile = await fetchAPI(`${API_URL}?path=student/profile/${encodeURIComponent(scholar)}`);
+
+  btn.disabled = false;
+  btn.textContent = 'LOGIN';
+
+  if (!profile || !profile.scholarNo) { showErr('Scholar Number or DOB incorrect'); return; }
+  if (normalizeDob(profile.dob) !== dob) { showErr('Scholar Number or DOB incorrect'); return; }
+
+  currentStudent = profile;
+  sessionStorage.setItem('tq_student', JSON.stringify(profile));
+  showDashboard();
+}
+
+function normalizeDob(dob) {
+  if (!dob) return '';
+  if (dob.includes('T')) {
+    try {
+      const ist = new Date(new Date(dob).getTime() + 5.5 * 60 * 60 * 1000);
+      return ist.toISOString().split('T')[0];
+    } catch(e) { return dob.split('T')[0]; }
+  }
+  return String(dob).split('T')[0];
+}
+
+function showErr(msg) {
+  const el = document.getElementById('loginError');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+document.getElementById('dobInput').addEventListener('keydown',    e => { if(e.key==='Enter') handleLogin(); });
+document.getElementById('scholarInput').addEventListener('keydown', e => { if(e.key==='Enter') handleLogin(); });
+
+// ── DASHBOARD ──
+function showDashboard() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('header').classList.add('visible');
+  document.getElementById('dashboard').classList.add('visible');
+  document.getElementById('studentBadge').style.display = 'flex';
+  document.getElementById('studentName').textContent  = currentStudent.name || currentStudent.scholarNo;
+  document.getElementById('heroScholar').textContent  = currentStudent.scholarNo;
+  document.getElementById('heroClass').textContent    = currentStudent.class || '—';
+  loadPage();
+}
+
+// ── PAGE LOAD ──
+// Fetches events list and registrations in ONE parallel pair — result shared between both sections
+async function loadPage() {
+  const [events, regs] = await Promise.all([
+    fetchAPI(`${API_URL}?path=events`),
+    fetchAPI(`${API_URL}?path=student/registrations/${currentStudent.scholarNo}`)
+  ]);
+  renderEvents(events, regs);
+  renderResults(regs);
+}
+
+// ── MANUAL REFRESH ──
+async function handleManualRefresh() {
+  const btn = document.getElementById('refreshBtn');
+  if (!btn || btn.disabled) return;
+  btn.disabled = true;
+  btn.classList.add('spinning');
+  showToast('Refreshing...', 'success');
+  try {
+    await loadPage();
+    showToast('Updated!', 'success');
+  } catch(e) {
+    showToast('Refresh failed. Try again.', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.classList.remove('spinning');
+  }
+}
+
+// ── EVENTS SECTION ──
+let appliedEventsCache = [];
+
+function renderEvents(events, regs) {
+  const grid = document.getElementById('eventsGrid');
+
+  if (!Array.isArray(events)) {
+    grid.innerHTML = '<div class="empty-state"><span class="empty-icon">⚡</span>Could not load events. Check connection.</div>';
+    return;
+  }
+
+  appliedEventsCache = Array.isArray(regs) ? regs.map(r => r.event) : [];
+  grid.innerHTML = '';
+
+  events.forEach(eventName => {
+    const applied = appliedEventsCache.includes(eventName);
+    const card    = document.createElement('div');
+    card.className = 'event-card';
+
+    const title = document.createElement('div');
+    title.className = 'event-name';
+    title.textContent = eventName;
+
+    const btn = document.createElement('button');
+    btn.className = 'btn-apply';
+    btn.disabled  = applied;
+    btn.textContent = applied ? 'Applied ✓' : 'Apply';
+    btn.dataset.event = eventName;
+
+    const status = document.createElement('div');
+    status.className = 'event-status' + (applied ? ' applied' : '');
+    status.textContent = applied ? '✓ Application submitted' : 'Click to apply';
+
+    card.appendChild(title);
+    card.appendChild(btn);
+    card.appendChild(status);
+    grid.appendChild(card);
+  });
+
+  // Single delegated listener — safe for event names with apostrophes
+  grid.onclick = (e) => {
+    const btn = e.target.closest('.btn-apply');
+    if (!btn || btn.disabled) return;
+    applyEvent(btn, btn.dataset.event);
+  };
+}
+
+// Fire-and-forget apply — no verification call, no auto loadResults.
+// Student uses the ↺ refresh button to confirm their registration.
+async function applyEvent(btn, eventName) {
+  btn.disabled    = true;
+  btn.textContent = 'Applying...';
+  const statusEl  = btn.nextElementSibling;
+
+  await fireWrite({
+    path:     'registrations',
+    name:     currentStudent.name,
+    scholar:  currentStudent.scholarNo,
+    cls:      currentStudent.class,
+    event:    eventName,
+    deviceId: getDeviceId()
+  });
+
+  // Optimistic UI update — no follow-up call
+  btn.textContent = 'Applied ✓';
+  if (statusEl) { statusEl.textContent = '✓ Application submitted'; statusEl.className = 'event-status applied'; }
+  appliedEventsCache.push(eventName);
+  showToast('Applied for ' + eventName + '! Use ↺ to confirm.', 'success');
+}
+
+// ── RESULTS SECTION ──
+function renderResults(regs) {
+  const grid = document.getElementById('selectionGrid');
+
+  if (!Array.isArray(regs) || regs.length === 0) {
+    grid.innerHTML = '<div class="empty-state"><span class="empty-icon">✅</span>Apply for events to see your selection status.</div>';
+    return;
+  }
+
+  grid.innerHTML = '';
+  regs.forEach(reg => {
+    const isSelected = String(reg.selected).toUpperCase() === 'TRUE';
+    const hasMarks   = parseFloat(reg.marks) > 0;
+
+    let bannerClass, bannerIcon, bannerText;
+    if (isSelected) {
+      bannerClass = 'selected';     bannerIcon = '🏆'; bannerText = 'You are SELECTED for this event!';
+    } else if (hasMarks) {
+      bannerClass = 'not-selected'; bannerIcon = '✗';  bannerText = 'Not selected for this event.';
+    } else {
+      bannerClass = 'pending';      bannerIcon = '⏳'; bannerText = 'Results not declared yet.';
+    }
+
+    const card = document.createElement('div');
+    card.className = 'result-card';
+    card.innerHTML = `
+      <div class="result-event-name">${reg.event}</div>
+      <div class="selection-banner ${bannerClass}">
+        <span>${bannerIcon}</span><span>${bannerText}</span>
+      </div>
+      ${isSelected && reg.teamName ? `<div class="result-row" style="margin-top:6px"><span class="result-label">Team</span><span style="font-size:12px;color:var(--text);font-weight:600">${reg.teamName}</span></div>` : ''}
+      ${isSelected && parseInt(reg.rank) > 0 ? `<div class="result-row"><span class="result-label">Rank</span><span class="badge rank">#${reg.rank}</span></div>` : ''}
+    `;
+    grid.appendChild(card);
+  });
+}
+
+// ── LOGOUT ──
+function handleLogout() {
+  sessionStorage.removeItem('tq_student');
+  location.reload();
+}
+
+// ── TOAST ──
+function showToast(msg, type = 'success') {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `<span>${type === 'success' ? '✓' : '✗'}</span><span>${msg}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.animation = 'slideDown 0.3s ease forwards';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+</script>
+</body>
+</html>
+

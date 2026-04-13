@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Notices — TechQuest 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#03050f;--surface:#080d1e;--surface2:#0d1530;
+      --blue:#4f6fff;--blue-dim:rgba(79,111,255,.1);--blue-bdr:rgba(79,111,255,.25);
+      --cyan:#29d4e0;--gold:#e8b84b;--gold-dim:rgba(232,184,75,.1);--gold-bdr:rgba(232,184,75,.22);
+      --green:#3dd68c;--green-dim:rgba(61,214,140,.1);--green-bdr:rgba(61,214,140,.25);
+      --text:#c8ddf0;--muted:#4a6080;--border:rgba(79,111,255,.12);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.6;min-height:100vh}
+    nav{position:fixed;top:0;left:0;right:0;height:56px;background:rgba(3,5,15,.95);border-bottom:1px solid var(--border);backdrop-filter:blur(18px);display:flex;align-items:center;justify-content:space-between;padding:0 5vw;z-index:1000}
+    .nav-logo{font-family:'IBM Plex Mono',monospace;font-size:.88em;font-weight:700;letter-spacing:2px;color:#fff;text-decoration:none}
+    .nav-logo span{color:var(--blue)}
+    .nav-back{font-family:'IBM Plex Mono',monospace;font-size:.68em;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);border:1px solid var(--border);padding:5px 14px;text-decoration:none;transition:all .2s}
+    .nav-back:hover{color:var(--text);border-color:var(--blue-bdr);background:var(--blue-dim)}
+    .jump-bar{position:fixed;top:56px;left:0;right:0;z-index:900;background:rgba(3,5,15,.97);border-bottom:1px solid var(--border);backdrop-filter:blur(12px);display:flex;align-items:center;padding:0 5vw;height:44px;overflow-x:auto;scrollbar-width:none}
+    .jump-bar::-webkit-scrollbar{display:none}
+    .jump-btn{font-family:'IBM Plex Mono',monospace;font-size:.62em;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;padding:0 18px;height:44px;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;color:var(--muted);transition:all .18s;white-space:nowrap;flex-shrink:0;display:inline-flex;align-items:center;gap:6px}
+    .jump-btn:hover{color:var(--text)}
+    .jump-btn.ag{color:var(--gold);border-bottom-color:var(--gold)}
+    .jump-btn.ab{color:var(--blue);border-bottom-color:var(--blue)}
+    .jump-btn.an{color:var(--green);border-bottom-color:var(--green)}
+    .jcount{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;border-radius:8px;font-size:.75em;font-weight:700;padding:0 4px}
+    .jcg{background:var(--gold-dim);color:var(--gold)}
+    .jcb{background:var(--blue-dim);color:var(--blue)}
+    .jcn{background:var(--green-dim);color:var(--green)}
+    .page{padding:120px 5vw 60px;max-width:1000px;margin:0 auto}
+    .page-eyebrow{font-family:'IBM Plex Mono',monospace;font-size:.65em;letter-spacing:4px;text-transform:uppercase;color:var(--blue);margin-bottom:.8em;display:flex;align-items:center;gap:10px}
+    .page-eyebrow::before{content:'//';opacity:.35}
+    .page-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(2em,5vw,3.4em);color:#fff;line-height:1;margin-bottom:.3em}
+    .page-title span{color:var(--blue)}
+    .title-rule{width:60px;height:2px;background:linear-gradient(90deg,var(--blue),transparent);margin:.8em 0 2.8em}
+    .section-anchor{display:block;height:0}
+    .section-block{margin-bottom:4em}
+    .section-label{font-family:'IBM Plex Mono',monospace;font-size:.62em;letter-spacing:3px;text-transform:uppercase;display:flex;align-items:center;gap:8px;margin-bottom:1em}
+    .section-label::before{content:'//';opacity:.35}
+    .lbl-gold{color:var(--gold)}.lbl-blue{color:var(--blue)}.lbl-green{color:var(--green)}
+    .section-rule{height:1px;margin-bottom:1.4em;background:linear-gradient(90deg,currentColor,transparent);opacity:.2}
+    .notices-list{display:flex;flex-direction:column;gap:1px}
+    .notice-card{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--blue);padding:1.3em 1.7em;transition:background .2s}
+    .notice-card:hover{background:var(--surface2)}
+    .card-gold{border-left-color:var(--gold)}.card-green{border-left-color:var(--green)}
+    .notice-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:.55em}
+    .notice-event-name{font-family:'IBM Plex Mono',monospace;font-size:.7em;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--cyan)}
+    .notice-origin-badge{font-family:'IBM Plex Mono',monospace;font-size:.58em;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:2px}
+    .badge-general{background:var(--blue-dim);color:var(--blue);border:1px solid var(--blue-bdr)}
+    .badge-event{background:rgba(41,212,224,.08);color:var(--cyan);border:1px solid rgba(41,212,224,.2)}
+    .notice-important-tag{font-family:'IBM Plex Mono',monospace;font-size:.56em;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;background:var(--gold-dim);color:var(--gold);border:1px solid var(--gold-bdr);border-radius:2px}
+    .notice-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.98em;color:#fff;margin-bottom:.45em}
+    .notice-body{font-size:.84em;color:var(--text);line-height:1.85}
+    .notice-body p{margin-bottom:.45em}.notice-body p:last-child{margin-bottom:0}
+    .notice-time{font-family:'IBM Plex Mono',monospace;font-size:.57em;color:var(--muted);margin-top:.75em}
+    .empty-state{padding:2.5em 2em;text-align:center;color:var(--muted);font-size:.8em;border:1px dashed var(--border);font-family:'IBM Plex Mono',monospace;letter-spacing:1px}
+    .spinner-wrap{display:flex;justify-content:center;padding:3em}
+    .spinner{width:26px;height:26px;border:2px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @media(max-width:600px){.page{padding:116px 4vw 48px}.notice-card{padding:1em 1.1em}.jump-btn{padding:0 12px;font-size:.58em}}
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">Tech<span>Quest</span></a>
+  <a href="index.html" class="nav-back">← Back</a>
+</nav>
+
+<div class="jump-bar">
+  <button class="jump-btn" id="jbtn-important" onclick="jumpTo('sec-important')">
+    ⚑ Important <span class="jcount jcg" id="cnt-important">–</span>
+  </button>
+  <button class="jump-btn" id="jbtn-general" onclick="jumpTo('sec-general')">
+    📋 General <span class="jcount jcb" id="cnt-general">–</span>
+  </button>
+  <button class="jump-btn" id="jbtn-event" onclick="jumpTo('sec-event')">
+    🎯 Events <span class="jcount jcn" id="cnt-event">–</span>
+  </button>
+</div>
+
+<div class="page">
+  <div class="page-eyebrow">TechQuest 2026</div>
+  <h1 class="page-title">Notices &amp; <span>Updates</span></h1>
+  <div class="title-rule"></div>
+
+  <span class="section-anchor" id="sec-important"></span>
+  <div class="section-block">
+    <div class="section-label lbl-gold">⚑ Important Notices</div>
+    <div class="section-rule" style="color:var(--gold)"></div>
+    <div id="importantList"><div class="spinner-wrap"><div class="spinner"></div></div></div>
+  </div>
+
+  <span class="section-anchor" id="sec-general"></span>
+  <div class="section-block">
+    <div class="section-label lbl-blue">📋 General Notices</div>
+    <div class="section-rule" style="color:var(--blue)"></div>
+    <div id="generalList"><div class="spinner-wrap"><div class="spinner"></div></div></div>
+  </div>
+
+  <span class="section-anchor" id="sec-event"></span>
+  <div class="section-block">
+    <div class="section-label lbl-green">🎯 Event Notices</div>
+    <div class="section-rule" style="color:var(--green)"></div>
+    <div id="eventList"><div class="spinner-wrap"><div class="spinner"></div></div></div>
+  </div>
+</div>
+
+<script>
+const API_URL='https://script.google.com/macros/s/AKfycbxd8e8AStR2au6eOUBB0NmeDESGMNjyDLLvu2HZmybr-TsjOM0jilZ6jDuOpIbIqcG5/exec';
+let allNotices=[];
+
+function fetchJSONP(url){
+  return new Promise((res,rej)=>{
+    const cb='_tqn_'+Math.random().toString(36).slice(2);
+    const s=document.createElement('script');
+    s.src=url+(url.includes('?')?'&':'?')+'callback='+cb;
+    s.onerror=()=>{delete window[cb];s.remove();rej()};
+    window[cb]=d=>{delete window[cb];s.remove();res(d)};
+    document.head.appendChild(s);
+  });
+}
+async function fetchAPI(url){
+  try{return await fetchJSONP(url);}
+  catch{try{const r=await fetch(url,{redirect:'follow'});return await r.json();}catch{return null;}}
+}
+
+function formatTime(ts){
+  if(!ts)return'';
+  const d=new Date(ts);
+  return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})+' · '+d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+}
+function bodyToHTML(t){
+  return t.split(/\n{2,}/).map(p=>'<p>'+p.replace(/\n/g,'<br>')+'</p>').join('');
+}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function renderAll(){
+  const imp=allNotices.filter(n=>n.important);
+  const gen=allNotices.filter(n=>n.type==='general');
+  const evt=allNotices.filter(n=>n.type==='event');
+  renderSection('importantList',imp,'important');
+  renderSection('generalList',gen,'general');
+  renderSection('eventList',evt,'event');
+  document.getElementById('cnt-important').textContent=imp.length;
+  document.getElementById('cnt-general').textContent=gen.length;
+  document.getElementById('cnt-event').textContent=evt.length;
+}
+
+function renderSection(id,notices,mode){
+  const el=document.getElementById(id);
+  if(!notices.length){el.innerHTML='<div class="empty-state">No notices yet.</div>';return;}
+  el.innerHTML='<div class="notices-list">'+notices.map(n=>cardHTML(n,mode)).join('')+'</div>';
+}
+
+function cardHTML(n,mode){
+  const isImp=mode==='important';
+  const cls=isImp?'notice-card card-gold':n.type==='event'?'notice-card card-green':'notice-card';
+  let meta='';
+  if(isImp){
+    meta=n.type==='event'&&n.eventName
+      ?`<span class="notice-origin-badge badge-event">${esc(n.eventName)}</span>`
+      :`<span class="notice-origin-badge badge-general">General</span>`;
+  }else if(n.type==='event'&&n.eventName){
+    meta=`<span class="notice-event-name">${esc(n.eventName)}</span>`;
+  }
+  if(n.important&&!isImp)meta+=`<span class="notice-important-tag">⚑ Important</span>`;
+  return`<div class="${cls}">
+    ${meta?`<div class="notice-meta">${meta}</div>`:''}
+    <div class="notice-title">${esc(n.title)}</div>
+    <div class="notice-body">${bodyToHTML(n.body)}</div>
+    <div class="notice-time">${formatTime(n.timestamp)}</div>
+  </div>`;
+}
+
+// ── JUMP BAR ──
+function jumpTo(id){
+  const el=document.getElementById(id);
+  if(!el)return;
+  window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-112,behavior:'smooth'});
+}
+
+const SEC=[
+  {id:'sec-important',btn:'jbtn-important',cls:'ag'},
+  {id:'sec-general',  btn:'jbtn-general',  cls:'ab'},
+  {id:'sec-event',    btn:'jbtn-event',     cls:'an'}
+];
+function onScroll(){
+  let active=null;
+  SEC.forEach(s=>{
+    const el=document.getElementById(s.id);
+    if(el&&el.getBoundingClientRect().top<=115)active=s;
+  });
+  SEC.forEach(s=>{
+    document.getElementById(s.btn).className='jump-btn'+(active===s?' '+s.cls:'');
+  });
+}
+window.addEventListener('scroll',onScroll,{passive:true});
+onScroll();
+
+async function loadNotices(){
+  const data=await fetchAPI(`${API_URL}?path=notices`);
+  allNotices=Array.isArray(data)?data:[];
+  renderAll();
+}
+loadNotices();
+</script>
+</body>
+</html>
