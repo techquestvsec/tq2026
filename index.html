@@ -1956,3 +1956,16 @@ if(window.PERF === 'high')(function(){
       cio.unobserve(el);
     });
   },{threshold:0.5});
+  document.querySelectorAll('.stat-num,.arena-stat-num').forEach(el=>cio.observe(el));
+})();
+
+
+
+
+</script>
+
+<!-- External Sprite System -->
+<link rel="stylesheet" href="sprites.css">
+<script src="sprites.js"></script>
+</body>
+</html>
