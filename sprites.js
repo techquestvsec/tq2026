@@ -343,7 +343,7 @@ function spawnNext() {
 function spawnSprite() {
   dismiss(() => {
     // 20% anime, 80% tech
-    const isAnime = Math.random() < 0.20;
+    const isAnime = Math.random() < 0.50;
     const pos     = POSITIONS[Math.floor(Math.random() * POSITIONS.length)];
     const isLeft  = !!pos.left;
 
