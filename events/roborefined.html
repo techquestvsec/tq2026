@@ -1,0 +1,227 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Robot Snooze — TechQuest 2026</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+  background:#05070f;
+  color:#e2e8f0;
+  font-family:'Segoe UI',sans-serif;
+  overflow-x:hidden;
+}
+
+/* GRID BACKGROUND */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(168,85,247,.05) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(168,85,247,.05) 1px,transparent 1px);
+  background-size:40px 40px;
+}
+
+/* NAV */
+nav{
+  position:sticky;top:0;
+  display:flex;justify-content:space-between;
+  padding:1rem 2rem;
+  background:rgba(5,7,15,.9);
+  backdrop-filter:blur(10px);
+}
+
+/* CONTAINER */
+.container{
+  max-width:900px;
+  margin:auto;
+  padding:2rem;
+}
+
+/* TITLE */
+h1{
+  font-size:3rem;
+  background:linear-gradient(90deg,#fff,#c084fc,#22d3ee);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:glitch 3s infinite;
+}
+
+@keyframes glitch{
+  0%{text-shadow:2px 0 #a855f7}
+  25%{text-shadow:-2px 0 #22d3ee}
+  50%{text-shadow:2px 0 #6366f1}
+  75%{text-shadow:-2px 0 #a855f7}
+  100%{text-shadow:none}
+}
+
+/* CARDS */
+.game-card{
+  background:#0c0f1c;
+  border:1px solid #1a1f38;
+  border-radius:14px;
+  padding:1.5rem;
+  margin-top:1rem;
+  transition:.3s;
+  cursor:pointer;
+}
+
+.game-card:hover{
+  transform:translateY(-4px) scale(1.02);
+  box-shadow:0 0 20px rgba(168,85,247,.6);
+}
+
+/* CURSOR GLOW */
+.cursor-glow{
+  position:fixed;
+  width:200px;height:200px;
+  background:radial-gradient(circle,rgba(168,85,247,.2),transparent 70%);
+  pointer-events:none;
+  transform:translate(-50%,-50%);
+}
+
+/* MINI GAME */
+#miniGame{
+  margin-top:3rem;
+  text-align:center;
+}
+
+canvas{
+  background:#0c0f1c;
+  border:1px solid #1a1f38;
+  border-radius:10px;
+  margin-top:1rem;
+}
+</style>
+</head>
+
+<body>
+
+<nav>
+  <div><b>TechQuest</b></div>
+  <div>Robot Snooze</div>
+</nav>
+
+<div class="container">
+
+<h1>Robot Snooze</h1>
+<p>5 Rounds. Chaos. Communication. Survival.</p>
+
+<!-- GAMES -->
+<div class="game-card">
+<h3>Game 1 — Laser Grid Escape</h3>
+<p>Avoid laser zones. Step wrong → freeze penalty.</p>
+</div>
+
+<div class="game-card">
+<h3>Game 2 — Object Fetch</h3>
+<p>Pick objects in order using voice only.</p>
+</div>
+
+<div class="game-card">
+<h3>Game 3 — Mirror Maze</h3>
+<p>All teams at once. Noise. Confusion.</p>
+</div>
+
+<div class="game-card">
+<h3>Game 4 — Code Relay</h3>
+<p>Memorize command sequence. Execute perfectly.</p>
+</div>
+
+<div class="game-card">
+<h3>Game 5 — Grand Final</h3>
+<p>Everything combined. Only one team wins.</p>
+</div>
+
+<!-- MINI GAME -->
+<div id="miniGame">
+<h3>🦖 Hidden Game — Press SPACE</h3>
+<canvas id="gameCanvas" width="700" height="160"></canvas>
+</div>
+
+</div>
+
+<script>
+/* CURSOR GLOW */
+const glow=document.createElement("div");
+glow.classList.add("cursor-glow");
+document.body.appendChild(glow);
+
+document.addEventListener("mousemove",e=>{
+  glow.style.left=e.clientX+"px";
+  glow.style.top=e.clientY+"px";
+});
+
+/* CLICK EFFECT */
+document.querySelectorAll('.game-card').forEach(card=>{
+  card.addEventListener('click',()=>{
+    card.style.transform="scale(0.96)";
+    setTimeout(()=>card.style.transform="",120);
+  });
+});
+
+/* MINI GAME */
+const canvas=document.getElementById("gameCanvas");
+const ctx=canvas.getContext("2d");
+
+let dino={x:50,y:120,w:20,h:20,vy:0,jumping:false};
+let gravity=0.7;
+let obstacles=[];
+
+document.addEventListener("keydown",e=>{
+  if(e.code==="Space"&&!dino.jumping){
+    dino.vy=-12;
+    dino.jumping=true;
+  }
+});
+
+setInterval(()=>{
+  obstacles.push({x:canvas.width,y:120,w:15,h:20});
+},1800);
+
+function update(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  dino.y+=dino.vy;
+  dino.vy+=gravity;
+
+  if(dino.y>=120){
+    dino.y=120;
+    dino.jumping=false;
+  }
+
+  ctx.fillStyle="#c084fc";
+  ctx.fillRect(dino.x,dino.y,dino.w,dino.h);
+
+  obstacles.forEach((obs,i)=>{
+    obs.x-=5;
+
+    ctx.fillStyle="#f87171";
+    ctx.fillRect(obs.x,obs.y,obs.w,obs.h);
+
+    if(
+      dino.x<obs.x+obs.w &&
+      dino.x+dino.w>obs.x &&
+      dino.y<obs.y+obs.h &&
+      dino.y+dino.h>obs.y
+    ){
+      alert("💀 Game Over");
+      obstacles=[];
+    }
+
+    if(obs.x<-20)obstacles.splice(i,1);
+  });
+
+  requestAnimationFrame(update);
+}
+
+update();
+</script>
+
+</body>
+</html>
+```
