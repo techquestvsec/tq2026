@@ -3,173 +3,620 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Robot Snooze &mdash; TechQuest 2026</title>
+  <title>Robot Snooze — TechQuest 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:        #0a0c12;
-      --surface:   #10131e;
-      --border:    #1b2035;
-      --accent:    #c088ff;   /* purple — robotics / fun games */
-      --accent2:   #818cf8;
-      --text:      #e2e8f0;
-      --muted:     #64748b;
-      --chip-bg:   #141828;
+      --bg:       #050710;
+      --surface:  #0b0e1f;
+      --surface2: #0f1228;
+      --border:   #1a1f3a;
+      --accent:   #b06dff;
+      --accent2:  #7c3aed;
+      --neon:     #d946ef;
+      --cyan:     #22d3ee;
+      --green:    #4ade80;
+      --text:     #e2e8f0;
+      --muted:    #64748b;
+      --dim:      #94a3b8;
     }
+
+    html { scroll-behavior: smooth; }
 
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 400;
       line-height: 1.7;
       min-height: 100vh;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* ── custom cursor ── */
+    .cursor {
+      width: 14px; height: 14px;
+      background: var(--accent);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform .08s, background .2s, width .2s, height .2s;
+      mix-blend-mode: screen;
+    }
+    .cursor-ring {
+      width: 36px; height: 36px;
+      border: 1.5px solid rgba(176,109,255,.5);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: transform .18s ease, border-color .2s;
+    }
+    .cursor.hovering { width: 20px; height: 20px; background: var(--neon); }
+    .cursor-ring.hovering { width: 52px; height: 52px; border-color: var(--neon); }
+
+    /* ── canvas bg ── */
+    #particles-canvas {
+      position: fixed; inset: 0; z-index: 0;
+      pointer-events: none; opacity: .6;
+    }
+
+    /* ── grid overlay ── */
+    .grid-overlay {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(176,109,255,.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(176,109,255,.03) 1px, transparent 1px);
+      background-size: 40px 40px;
     }
 
     /* ── nav ── */
     nav {
-      position: sticky; top: 0; z-index: 50;
+      position: sticky; top: 0; z-index: 100;
       display: flex; align-items: center; justify-content: space-between;
-      padding: 0 2rem; height: 60px;
-      background: rgba(10,12,18,.88);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border);
+      padding: 0 2.5rem; height: 64px;
+      background: rgba(5,7,16,.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(176,109,255,.15);
     }
-    .nav-logo { font-size: 1.25rem; font-weight: 700; color: var(--text); text-decoration: none; }
+    .nav-logo {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.1rem; font-weight: 700;
+      color: var(--text); text-decoration: none;
+      letter-spacing: .05em;
+    }
     .nav-logo span { color: var(--accent); }
-    .nav-links { list-style: none; display: flex; gap: 1.5rem; }
-    .nav-links a { color: var(--muted); text-decoration: none; font-size: .9rem; transition: color .2s; }
-    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .nav-links { list-style: none; display: flex; gap: 2rem; }
+    .nav-links a {
+      color: var(--muted); text-decoration: none;
+      font-size: .9rem; font-weight: 500; letter-spacing: .06em;
+      text-transform: uppercase;
+      transition: color .2s;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--accent); }
 
     /* ── page wrap ── */
-    .detail-wrap {
-      max-width: 820px;
+    .wrap {
+      max-width: 900px;
       margin: 0 auto;
-      padding: 2.5rem 1.5rem 5rem;
+      padding: 2.5rem 1.5rem 6rem;
+      position: relative; z-index: 1;
     }
 
     /* ── back ── */
     .back-btn {
-      display: inline-flex; align-items: center; gap: .4rem;
-      color: var(--muted); text-decoration: none; font-size: .85rem;
-      margin-bottom: 2rem; transition: color .2s;
+      display: inline-flex; align-items: center; gap: .5rem;
+      color: var(--muted); text-decoration: none;
+      font-size: .82rem; font-weight: 600;
+      letter-spacing: .1em; text-transform: uppercase;
+      margin-bottom: 2.5rem;
+      transition: color .2s;
     }
     .back-btn:hover { color: var(--accent); }
+    .back-btn svg { transition: transform .2s; }
+    .back-btn:hover svg { transform: translateX(-4px); }
 
-    /* ── header ── */
-    .detail-header { margin-bottom: 1.5rem; }
+    /* ── hero ── */
+    .hero { margin-bottom: 2rem; position: relative; }
 
-    .cat {
-      display: inline-block;
-      padding: .25rem .75rem;
+    .cat-pill {
+      display: inline-flex; align-items: center; gap: .45rem;
+      padding: .3rem .9rem;
       border-radius: 999px;
-      font-size: .75rem; font-weight: 600;
-      letter-spacing: .05em; text-transform: uppercase;
-      margin-bottom: .75rem;
+      font-size: .72rem; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase;
+      background: rgba(176,109,255,.08);
+      color: var(--accent);
+      border: 1px solid rgba(176,109,255,.25);
+      margin-bottom: 1.2rem;
     }
-    .cat-robot { background: rgba(192,136,255,.1); color: #c088ff; border: 1px solid rgba(192,136,255,.25); }
+    .cat-pill-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent);
+      animation: pulse-dot 1.8s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50% { opacity: .4; transform: scale(.6); }
+    }
 
-    .detail-title {
-      font-size: clamp(2rem, 5vw, 3rem);
-      font-weight: 800; letter-spacing: -.02em; line-height: 1.1;
-      margin-bottom: .75rem;
-      background: linear-gradient(135deg, #e2e8f0 30%, var(--accent));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    .hero-title {
+      font-family: 'Orbitron', monospace;
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -.01em;
+      margin-bottom: 1rem;
     }
-    .detail-tagline { color: var(--muted); font-size: 1.05rem; max-width: 600px; }
+    .hero-title .line1 { display: block; color: var(--text); }
+    .hero-title .line2 {
+      display: block;
+      background: linear-gradient(90deg, var(--accent) 0%, var(--neon) 60%, var(--cyan) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      animation: hue-shift 5s linear infinite;
+    }
+    @keyframes hue-shift {
+      0%   { filter: hue-rotate(0deg); }
+      100% { filter: hue-rotate(360deg); }
+    }
+
+    .hero-tagline {
+      color: var(--dim); font-size: 1.1rem; max-width: 580px;
+      font-weight: 400; line-height: 1.7;
+    }
+
+    /* ── scanline ── */
+    .scanline-bar {
+      width: 100%; height: 2px; margin: 2rem 0;
+      background: linear-gradient(90deg, transparent, var(--accent), var(--neon), var(--cyan), transparent);
+      position: relative; overflow: hidden;
+    }
+    .scanline-bar::after {
+      content: '';
+      position: absolute; top: 0; left: -60%;
+      width: 60%; height: 100%;
+      background: linear-gradient(90deg, transparent, #fff, transparent);
+      animation: scan 2.5s linear infinite;
+    }
+    @keyframes scan { to { left: 160%; } }
 
     /* ── meta chips ── */
-    .meta-row { display: flex; flex-wrap: wrap; gap: .6rem; margin-bottom: 2rem; }
+    .meta-row { display: flex; flex-wrap: wrap; gap: .6rem; margin-bottom: 2.5rem; }
     .meta-chip {
       display: flex; align-items: center; gap: .5rem;
-      background: var(--chip-bg); border: 1px solid var(--border);
+      background: var(--surface); border: 1px solid var(--border);
       border-radius: 8px; padding: .45rem .9rem;
       font-size: .85rem; color: var(--text);
+      font-weight: 500;
+      transition: border-color .2s, background .2s;
     }
+    .meta-chip:hover { border-color: rgba(176,109,255,.4); background: var(--surface2); }
     .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
 
-    .divider { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
-
-    /* ── sections ── */
-    .ds { margin-bottom: 1.5rem; }
-    .ds-label {
-      font-size: .7rem; font-weight: 700; letter-spacing: .12em;
-      text-transform: uppercase; color: var(--accent); margin-bottom: 1rem;
+    /* ── section label ── */
+    .sec-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .7rem; letter-spacing: .2em;
+      text-transform: uppercase; color: var(--cyan);
+      margin-bottom: 1.2rem;
+      display: flex; align-items: center; gap: .75rem;
     }
-    .ds p { color: #94a3b8; margin-bottom: .75rem; }
-    .ds ul { padding-left: 1.2rem; }
-    .ds ul li { color: #94a3b8; margin-bottom: .4rem; }
+    .sec-label::after {
+      content: '';
+      flex: 1; height: 1px;
+      background: linear-gradient(90deg, rgba(34,211,238,.3), transparent);
+    }
+
+    /* ── overview ── */
+    .overview-text { color: var(--dim); font-size: 1.05rem; line-height: 1.8; }
+    .overview-text b { color: var(--accent); font-weight: 700; }
+    .overview-text p + p { margin-top: .85rem; }
+
+    /* ── GAMES GRID ── */
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1rem; margin-top: 1rem;
+    }
+    .game-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.4rem;
+      position: relative; overflow: hidden;
+      transition: transform .25s, border-color .25s, box-shadow .25s;
+      cursor: default;
+    }
+    .game-card::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(176,109,255,.06), transparent 60%);
+      opacity: 0; transition: opacity .25s;
+    }
+    .game-card:hover { transform: translateY(-4px); border-color: rgba(176,109,255,.35); box-shadow: 0 8px 30px rgba(176,109,255,.12); }
+    .game-card:hover::before { opacity: 1; }
+    .game-icon {
+      font-size: 2rem; margin-bottom: .8rem;
+      display: block;
+      transition: transform .25s;
+    }
+    .game-card:hover .game-icon { transform: scale(1.15) rotate(-4deg); }
+    .game-name {
+      font-family: 'Orbitron', monospace;
+      font-size: .85rem; font-weight: 700;
+      color: var(--text); margin-bottom: .5rem;
+      letter-spacing: .04em;
+    }
+    .game-desc { color: var(--dim); font-size: .88rem; line-height: 1.6; }
+    .game-tag {
+      display: inline-block; margin-top: .75rem;
+      padding: .2rem .6rem;
+      border-radius: 6px;
+      font-size: .68rem; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase;
+    }
+    .tag-run { background: rgba(74,222,128,.1); color: var(--green); border: 1px solid rgba(74,222,128,.2); }
+    .tag-jump { background: rgba(34,211,238,.1); color: var(--cyan); border: 1px solid rgba(34,211,238,.2); }
+    .tag-nav { background: rgba(217,70,239,.1); color: var(--neon); border: 1px solid rgba(217,70,239,.2); }
+    .tag-team { background: rgba(176,109,255,.1); color: var(--accent); border: 1px solid rgba(176,109,255,.2); }
+
+    /* ── pre-event ── */
+    .pre-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; margin-top: .5rem;
+    }
+    .pre-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1rem 1.2rem;
+      transition: border-color .2s;
+    }
+    .pre-card:hover { border-color: rgba(34,211,238,.3); }
+    .pre-card-lbl {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .65rem; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--cyan); margin-bottom: .4rem;
+    }
+    .pre-card-val { color: var(--dim); font-size: .92rem; font-weight: 500; }
 
     /* ── round cards ── */
-    .round {
+    .round-card {
       background: var(--surface); border: 1px solid var(--border);
-      border-radius: 12px; padding: 1.25rem 1.5rem; margin-bottom: 1rem;
+      border-radius: 14px; padding: 1.4rem 1.6rem; margin-bottom: 1rem;
+      position: relative; overflow: hidden;
+      transition: border-color .25s;
     }
+    .round-card::after {
+      content: '';
+      position: absolute; left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: linear-gradient(180deg, var(--accent), var(--neon));
+    }
+    .round-card:hover { border-color: rgba(176,109,255,.3); }
     .round-lbl {
-      font-size: .7rem; font-weight: 700; letter-spacing: .1em;
-      text-transform: uppercase; color: var(--accent2); margin-bottom: .3rem;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .68rem; letter-spacing: .14em; text-transform: uppercase;
+      color: var(--accent2); margin-bottom: .35rem;
     }
-    .round-name { font-size: 1.1rem; font-weight: 700; margin-bottom: .8rem; color: var(--text); }
-    .round-body p { color: #94a3b8; margin-bottom: .6rem; font-size: .95rem; }
+    .round-name {
+      font-family: 'Orbitron', monospace;
+      font-size: 1rem; font-weight: 700;
+      color: var(--text); margin-bottom: .9rem;
+    }
+    .round-body p { color: var(--dim); margin-bottom: .6rem; font-size: .95rem; }
     .round-body ul { padding-left: 1.2rem; }
-    .round-body ul li { color: #94a3b8; margin-bottom: .35rem; font-size: .92rem; }
-
-    /* ── pre-event grid ── */
-    .pre-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; margin-top: .5rem; }
-    .pre-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.2rem; }
-    .pre-card-lbl { font-size: .68rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--accent2); margin-bottom: .4rem; }
-    .pre-card-val { color: #94a3b8; font-size: .9rem; }
+    .round-body ul li { color: var(--dim); margin-bottom: .4rem; font-size: .92rem; }
+    .round-body ul li b { color: var(--accent); }
 
     /* ── scoring table ── */
     .score-table { width: 100%; border-collapse: collapse; margin-top: .75rem; }
-    .score-table th, .score-table td { text-align: left; padding: .6rem .9rem; font-size: .9rem; border-bottom: 1px solid var(--border); }
-    .score-table th { color: var(--accent); font-weight: 600; font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; }
-    .score-table td { color: #94a3b8; }
-    .score-table tr:last-child td { border-bottom: none; }
+    .score-table th, .score-table td {
+      text-align: left; padding: .7rem 1rem;
+      font-size: .9rem; border-bottom: 1px solid var(--border);
+    }
+    .score-table th {
+      font-family: 'Share Tech Mono', monospace;
+      color: var(--cyan); font-weight: 400;
+      font-size: .72rem; letter-spacing: .12em; text-transform: uppercase;
+    }
+    .score-table td { color: var(--dim); }
+    .score-table td:last-child { color: var(--accent); font-weight: 700; font-family: 'Orbitron', monospace; font-size: .88rem; }
+    .score-table tr:last-child td { border-bottom: none; color: var(--text); font-weight: 700; }
+    .score-table tr:last-child td:last-child { color: var(--neon); }
+    .score-table tr { transition: background .2s; }
+    .score-table tbody tr:not(:last-child):hover { background: rgba(176,109,255,.04); }
 
-    /* ── host grid ── */
-    .host-grid { display: flex; flex-direction: column; gap: .75rem; }
+    .tiebreaker-note {
+      margin-top: 1rem;
+      padding: .75rem 1rem;
+      background: rgba(34,211,238,.05); border: 1px solid rgba(34,211,238,.15);
+      border-radius: 8px; color: var(--dim); font-size: .88rem;
+    }
+    .tiebreaker-note b { color: var(--cyan); }
+
+    /* ── rules ── */
+    .rules-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .rule-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1.3rem 1.5rem;
+    }
+    .rule-card.allowed { border-color: rgba(74,222,128,.2); }
+    .rule-card.banned  { border-color: rgba(239,68,68,.2); }
+    .rule-title {
+      font-family: 'Orbitron', monospace;
+      font-size: .82rem; font-weight: 700;
+      margin-bottom: 1rem; letter-spacing: .05em;
+    }
+    .rule-card.allowed .rule-title { color: var(--green); }
+    .rule-card.banned  .rule-title { color: #f87171; }
+    .rule-list { list-style: none; padding: 0; }
+    .rule-list li {
+      color: var(--dim); font-size: .9rem;
+      padding: .35rem 0; padding-left: 1.4rem;
+      position: relative; border-bottom: 1px solid var(--border);
+    }
+    .rule-list li:last-child { border-bottom: none; }
+    .rule-list li::before { position: absolute; left: 0; }
+    .rule-card.allowed .rule-list li::before { content: '✓'; color: var(--green); }
+    .rule-card.banned  .rule-list li::before { content: '✕'; color: #f87171; }
+
+    /* ── hosts ── */
+    .host-grid { display: flex; flex-direction: column; gap: .7rem; }
     .host-item {
       background: var(--surface); border: 1px solid var(--border);
       border-radius: 10px; padding: .9rem 1.2rem;
-      font-size: .95rem; color: var(--text);
-      display: flex; align-items: center; gap: .75rem;
+      display: flex; align-items: center; gap: .8rem;
+      font-size: .95rem; color: var(--text); font-weight: 500;
+      transition: border-color .2s, background .2s;
     }
+    .host-item:hover { border-color: rgba(176,109,255,.3); background: var(--surface2); }
     .host-tag {
-      display: inline-block;
-      background: rgba(192,136,255,.1); color: var(--accent);
-      border: 1px solid rgba(192,136,255,.25);
-      border-radius: 6px; font-size: .7rem; font-weight: 700;
-      letter-spacing: .06em; text-transform: uppercase;
-      padding: .2rem .55rem; white-space: nowrap;
+      background: rgba(176,109,255,.1); color: var(--accent);
+      border: 1px solid rgba(176,109,255,.25);
+      border-radius: 6px; font-size: .68rem; font-weight: 700;
+      letter-spacing: .08em; text-transform: uppercase;
+      padding: .22rem .6rem; white-space: nowrap;
+      font-family: 'Share Tech Mono', monospace;
     }
+
+    /* ── divider ── */
+    .div { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+
+    /* ── section block ── */
+    .sec { margin-bottom: 1.5rem; }
+
+    /* ── scroll reveal ── */
+    .reveal {
+      opacity: 0; transform: translateY(28px);
+      transition: opacity .6s ease, transform .6s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── stat bar ── */
+    .stat-row {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 1rem; margin-top: .5rem;
+    }
+    .stat-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.2rem; text-align: center;
+      position: relative; overflow: hidden;
+      transition: border-color .25s, transform .25s;
+    }
+    .stat-box:hover { border-color: rgba(176,109,255,.4); transform: translateY(-3px); }
+    .stat-box::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--neon));
+    }
+    .stat-num {
+      font-family: 'Orbitron', monospace;
+      font-size: 2rem; font-weight: 900;
+      background: linear-gradient(135deg, var(--accent), var(--neon));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .stat-lbl {
+      color: var(--muted); font-size: .78rem; font-weight: 600;
+      letter-spacing: .1em; text-transform: uppercase; margin-top: .25rem;
+    }
+
+    /* ── REALISTIC GLITCH ── */
+    .glitch-wrap {
+      position: relative;
+      display: inline-block;
+      /* random trigger via animation */
+      animation: glitch-trigger 6s steps(1) infinite;
+    }
+
+    /* The two chromatic aberration layers */
+    .glitch-wrap::before,
+    .glitch-wrap::after {
+      content: attr(data-text);
+      position: absolute;
+      inset: 0;
+      font-family: 'Orbitron', monospace;
+      font-weight: 900;
+      font-size: inherit;
+      line-height: inherit;
+      letter-spacing: inherit;
+      white-space: nowrap;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    /* RED / magenta channel — left offset */
+    .glitch-wrap::before {
+      color: #ff2d78;
+      text-shadow: none;
+      left: 0; top: 0;
+      animation: glitch-red 6s steps(1) infinite;
+      opacity: 0;
+      mix-blend-mode: screen;
+    }
+
+    /* CYAN channel — right offset */
+    .glitch-wrap::after {
+      color: #00f0ff;
+      text-shadow: none;
+      left: 0; top: 0;
+      animation: glitch-cyan 6s steps(1) infinite;
+      opacity: 0;
+      mix-blend-mode: screen;
+    }
+
+    /* Main text jitter */
+    @keyframes glitch-trigger {
+      0%,  9%  { transform: none; }
+      10%       { transform: translate(-2px, 1px) skewX(-1deg); }
+      10.5%     { transform: translate(3px, -1px) skewX(2deg); }
+      11%       { transform: translate(-1px, 2px) skewX(-1deg); }
+      11.5%     { transform: none; }
+      /* second burst */
+      42%       { transform: none; }
+      42.5%     { transform: translate(4px, 0) skewX(3deg); }
+      43%        { transform: translate(-3px, 1px); }
+      43.5%     { transform: translate(1px, -1px) skewX(-2deg); }
+      44%        { transform: none; }
+      /* third burst */
+      77%       { transform: none; }
+      77.3%     { transform: translate(-4px, -1px) skewX(4deg); }
+      77.6%     { transform: translate(2px, 2px) skewX(-2deg); }
+      77.9%     { transform: translate(-1px, 0); }
+      78%        { transform: none; }
+      100%      { transform: none; }
+    }
+
+    @keyframes glitch-red {
+      0%,  9.9%  { opacity: 0; transform: none; clip-path: none; }
+      10%         { opacity: .8; transform: translate(-4px, 0); clip-path: inset(5% 0 80% 0); }
+      10.3%       { clip-path: inset(55% 0 30% 0); transform: translate(3px, 0); }
+      10.6%       { clip-path: inset(30% 0 55% 0); transform: translate(-3px, 1px); }
+      10.9%       { clip-path: inset(75% 0 10% 0); transform: translate(4px, 0); }
+      11%         { opacity: 0; transform: none; clip-path: none; }
+
+      42%,  42.4% { opacity: 0; }
+      42.5%       { opacity: .9; transform: translate(-5px, 1px); clip-path: inset(10% 0 70% 0); }
+      42.7%       { clip-path: inset(40% 0 40% 0); transform: translate(4px, -1px); }
+      43%         { clip-path: inset(65% 0 15% 0); transform: translate(-2px, 0); }
+      43.2%       { opacity: 0; clip-path: none; }
+
+      77%,  77.2% { opacity: 0; }
+      77.3%       { opacity: .85; transform: translate(-3px, -1px); clip-path: inset(20% 0 60% 0); }
+      77.5%       { clip-path: inset(50% 0 25% 0); transform: translate(5px, 0); }
+      77.7%       { clip-path: inset(70% 0 5% 0); transform: translate(-4px, 1px); }
+      77.9%       { opacity: 0; clip-path: none; }
+      100%        { opacity: 0; }
+    }
+
+    @keyframes glitch-cyan {
+      0%,  9.9%  { opacity: 0; transform: none; clip-path: none; }
+      10%         { opacity: .7; transform: translate(4px, -1px); clip-path: inset(15% 0 70% 0); }
+      10.3%       { clip-path: inset(45% 0 40% 0); transform: translate(-3px, 0); }
+      10.6%       { clip-path: inset(65% 0 20% 0); transform: translate(3px, 1px); }
+      10.9%       { clip-path: inset(85% 0 5% 0); transform: translate(-4px, 0); }
+      11%         { opacity: 0; transform: none; clip-path: none; }
+
+      42%,  42.4% { opacity: 0; }
+      42.5%       { opacity: .75; transform: translate(5px, -1px); clip-path: inset(5% 0 80% 0); }
+      42.7%       { clip-path: inset(30% 0 55% 0); transform: translate(-4px, 1px); }
+      43%         { clip-path: inset(60% 0 25% 0); transform: translate(3px, 0); }
+      43.2%       { opacity: 0; clip-path: none; }
+
+      77%,  77.2% { opacity: 0; }
+      77.3%       { opacity: .8; transform: translate(4px, 1px); clip-path: inset(30% 0 50% 0); }
+      77.5%       { clip-path: inset(55% 0 30% 0); transform: translate(-5px, -1px); }
+      77.7%       { clip-path: inset(80% 0 5% 0); transform: translate(3px, 0); }
+      77.9%       { opacity: 0; clip-path: none; }
+      100%        { opacity: 0; }
+    }
+
+    /* ── TBD panel ── */
+    .tbd-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem 2rem 1.8rem;
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .tbd-panel::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(176,109,255,.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .tbd-icon { font-size: 2.6rem; margin-bottom: 1rem; }
+    .tbd-heading {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.1rem; font-weight: 700;
+      color: var(--text); margin-bottom: .75rem;
+      letter-spacing: .05em;
+    }
+    .tbd-sub {
+      color: var(--dim); font-size: .98rem; line-height: 1.8;
+      max-width: 560px; margin: 0 auto 1.2rem;
+    }
+    .tbd-sub b { color: var(--accent); }
+    .tbd-tags { display: flex; flex-wrap: wrap; justify-content: center; gap: .5rem; margin-bottom: 1.4rem; }
+    .tbd-note {
+      display: inline-flex; align-items: center; gap: .4rem;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .78rem; color: var(--muted);
+      letter-spacing: .06em;
+      background: rgba(176,109,255,.05);
+      border: 1px solid rgba(176,109,255,.15);
+      border-radius: 8px; padding: .5rem 1rem;
+    }
+    .tbd-blink {
+      color: var(--accent);
+      animation: blink .9s steps(1) infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
 
     footer {
       text-align: center; padding: 2rem 1rem;
       border-top: 1px solid var(--border);
       color: var(--muted); font-size: .85rem;
+      position: relative; z-index: 1;
     }
-    .footer-logo { font-size: 1rem; font-weight: 700; margin-bottom: .3rem; }
+    .footer-logo {
+      font-family: 'Orbitron', monospace;
+      font-size: 1rem; font-weight: 700; margin-bottom: .3rem; color: var(--text);
+    }
     .footer-logo span { color: var(--accent); }
 
     #topBtn {
-      position: fixed; bottom: 1.5rem; right: 1.5rem;
-      background: var(--accent); color: #000;
-      width: 38px; height: 38px; border-radius: 50%;
+      position: fixed; bottom: 1.8rem; right: 1.8rem;
+      background: linear-gradient(135deg, var(--accent), var(--neon));
+      color: #000; width: 42px; height: 42px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      text-decoration: none; font-size: 1rem;
-      opacity: .8; transition: opacity .2s;
+      text-decoration: none; font-size: 1.1rem;
+      box-shadow: 0 0 20px rgba(176,109,255,.4);
+      transition: transform .2s, box-shadow .2s;
+      z-index: 200;
     }
-    #topBtn:hover { opacity: 1; }
+    #topBtn:hover { transform: translateY(-4px); box-shadow: 0 0 30px rgba(176,109,255,.6); }
 
-    @media (max-width: 600px) {
+    @media (max-width: 680px) {
       nav { padding: 0 1rem; }
-      .detail-wrap { padding: 1.5rem 1rem 4rem; }
+      .wrap { padding: 1.5rem 1rem 4rem; }
       .pre-grid { grid-template-columns: 1fr; }
+      .rules-grid { grid-template-columns: 1fr; }
+      .stat-row { grid-template-columns: 1fr 1fr; }
     }
   </style>
 </head>
 <body>
+
+<canvas id="particles-canvas"></canvas>
+<div class="grid-overlay"></div>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
 
 <!-- NAV -->
 <nav>
@@ -181,56 +628,109 @@
   </ul>
 </nav>
 
-<div class="detail-wrap">
+<div class="wrap">
 
-  <a href="../index.html#events" class="back-btn">&larr; Back to Events</a>
+  <a href="../index.html#events" class="back-btn">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8L10 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    Back to Events
+  </a>
 
-  <!-- HEADER -->
-  <div class="detail-header">
-    <span class="cat cat-robot">Fun Games</span>
-    <h1 class="detail-title">Robot Snooze</h1>
-    <p class="detail-tagline">
-      One commands. One obeys. Chaos begins. &mdash; A blindfolded teamwork
-      challenge where the only tool is your voice.
+  <!-- HERO -->
+  <div class="hero reveal">
+    <div class="cat-pill"><span class="cat-pill-dot"></span>Fun Games</div>
+    <h1 class="hero-title">
+      <span class="line1">ROBOT</span>
+      <span class="line2 glitch-wrap" data-text="SNOOZE">SNOOZE</span>
+    </h1>
+    <p class="hero-tagline">
+      One commands. One obeys. Chaos begins. — A blindfolded teamwork
+      challenge where your only weapon is your voice, and your teammate has to
+      trust every word you say.
     </p>
   </div>
 
+  <div class="scanline-bar"></div>
+
   <!-- META -->
-  <div class="meta-row">
+  <div class="meta-row reveal">
     <div class="meta-chip"><span class="dot"></span><b>Type:</b>&nbsp;Physical Activity</div>
-    <div class="meta-chip"><span class="dot"></span><b>Mode:</b>&nbsp;Team</div>
+    <div class="meta-chip"><span class="dot"></span><b>Mode:</b>&nbsp;Team (2 members)</div>
     <div class="meta-chip"><span class="dot"></span><b>Duration:</b>&nbsp;5 Hours</div>
     <div class="meta-chip"><span class="dot"></span><b>Max Teams:</b>&nbsp;15</div>
-    <div class="meta-chip"><span class="dot"></span><b>Open To:</b>&nbsp;Classes 5&ndash;8</div>
+    <div class="meta-chip"><span class="dot"></span><b>Open To:</b>&nbsp;Classes 5–8</div>
     <div class="meta-chip"><span class="dot"></span><b>Venue:</b>&nbsp;School Ground</div>
   </div>
 
-  <div class="divider"></div>
-
-  <!-- OVERVIEW -->
-  <div class="ds">
-    <div class="ds-label">Overview</div>
-    <p>
-      Robot Snooze is a fun, team-based physical challenge where one player acts as
-      the <b>Controller</b> and the other plays the <b>Robot</b> — blindfolded and
-      following only verbal instructions to complete tasks on the school ground.
-    </p>
-    <p>
-      Teams must rely entirely on clear communication and coordination. Physical
-      contact, gestures, and non-verbal cues are all banned. Only your words can
-      guide your robot.
-    </p>
+  <!-- STATS -->
+  <div class="stat-row reveal">
+    <div class="stat-box">
+      <div class="stat-num">15</div>
+      <div class="stat-lbl">Max Teams</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num">TBD</div>
+      <div class="stat-lbl">Games Lineup</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num">50</div>
+      <div class="stat-lbl">Total Marks</div>
+    </div>
   </div>
 
-  <div class="divider"></div>
+  <hr class="div">
+
+  <!-- OVERVIEW -->
+  <div class="sec reveal">
+    <div class="sec-label">// overview</div>
+    <div class="overview-text">
+      <p>
+        Robot Snooze is a high-energy, team-based physical challenge where one student acts as the
+        <b>Guide</b> and the other is the <b>Blindfolded Player</b> — navigating physical games
+        using only verbal instructions from their partner.
+      </p>
+      <p>
+        Teams must rely entirely on clear communication and split-second coordination. Physical
+        contact, gestures, coded signals — all banned. Only your words can steer your teammate
+        through running, dodging, and unpredictable chaos.
+      </p>
+    </div>
+  </div>
+
+  <hr class="div">
+
+  <!-- WHAT TO EXPECT -->
+  <div class="sec reveal">
+    <div class="sec-label">// what to expect</div>
+    <div class="tbd-panel">
+      <div class="tbd-icon">🎮</div>
+      <div class="tbd-heading">Games To Be Announced</div>
+      <div class="tbd-sub">
+        Robot Snooze is a <b>physical fun games</b> event — activities will involve running,
+        movement challenges, and coordination tasks played out on the school ground.
+        The blindfolded student must rely entirely on their partner's voice to navigate
+        whatever the hosts throw at them. Expect chaos. Expect laughter. Expect the unexpected.
+      </div>
+      <div class="tbd-tags">
+        <span class="game-tag tag-run">Running</span>
+        <span class="game-tag tag-team">Coordination</span>
+        <span class="game-tag tag-nav">Navigation</span>
+        <span class="game-tag tag-jump">Physical Tasks</span>
+      </div>
+      <div class="tbd-note">
+        <span class="tbd-blink">▋</span>&nbsp;Full game lineup will be revealed on event day
+      </div>
+    </div>
+  </div>
+
+  <hr class="div">
 
   <!-- PRE-EVENT -->
-  <div class="ds">
-    <div class="ds-label">Pre-Event &mdash; Selection Round</div>
+  <div class="sec reveal">
+    <div class="sec-label">// pre-event — selection round</div>
     <div class="pre-grid">
       <div class="pre-card">
         <div class="pre-card-lbl">When</div>
-        <div class="pre-card-val">2&ndash;3 weeks after registration closes</div>
+        <div class="pre-card-val">2–3 weeks after registration closes</div>
       </div>
       <div class="pre-card">
         <div class="pre-card-lbl">Format</div>
@@ -251,39 +751,38 @@
     </div>
   </div>
 
-  <div class="divider"></div>
+  <hr class="div">
 
   <!-- EVENT STRUCTURE -->
-  <div class="ds">
-    <div class="ds-label">Event Structure</div>
+  <div class="sec reveal">
+    <div class="sec-label">// event structure</div>
 
-    <div class="round">
-      <div class="round-lbl">Final Showdown &mdash; 5 Hours</div>
-      <div class="round-name">Robot Snooze — Final Challenge</div>
+    <div class="round-card">
+      <div class="round-lbl">Final Showdown — 5 Hours</div>
+      <div class="round-name">Robot Snooze — The Gauntlet</div>
       <div class="round-body">
         <p>
-          One team member is blindfolded — the <b>Robot</b>. The other is the
-          <b>Controller</b>, who must guide the Robot through a series of tasks
-          using only verbal instructions. Teams are scored on how well they
-          communicate, how precisely the Robot executes, and how efficiently they
-          complete the challenge.
+          One team member is blindfolded — the <b>Blindfolded Player</b>. The other is the
+          <b>Guide</b>, who must direct their partner through a series of physical fun games
+          using only verbal instructions. Teams are scored on coordination, precision, and speed.
         </p>
         <ul>
-          <li>Only <b>verbal instructions</b> are allowed from the Controller</li>
-          <li>The Robot must remain blindfolded at all times during the round</li>
+          <li>Only <b>verbal instructions</b> are allowed from the Guide</li>
+          <li>The Blindfolded Player must keep the blindfold on at all times during active rounds</li>
           <li>No physical contact, gestures, or non-verbal signals permitted</li>
           <li>Teams must stay within the defined activity area on the school ground</li>
           <li>Safe and controlled movement is required at all times</li>
+          <li>Roles may be swapped between games at the team's discretion</li>
         </ul>
       </div>
     </div>
   </div>
 
-  <div class="divider"></div>
+  <hr class="div">
 
   <!-- JUDGING -->
-  <div class="ds">
-    <div class="ds-label">Judging &amp; Scoring</div>
+  <div class="sec reveal">
+    <div class="sec-label">// judging & scoring</div>
     <table class="score-table">
       <thead>
         <tr>
@@ -293,85 +792,168 @@
         </tr>
       </thead>
       <tbody>
-        <tr><td>1</td><td>Coordination &amp; Teamwork</td><td>20</td></tr>
-        <tr><td>2</td><td>Control &amp; Precision</td><td>10</td></tr>
-        <tr><td>3</td><td>Time Efficiency</td><td>10</td></tr>
-        <tr><td>4</td><td>Communication Clarity</td><td>10</td></tr>
-        <tr><td></td><td><b>Total</b></td><td><b>50</b></td></tr>
+        <tr><td>01</td><td>Coordination &amp; Teamwork</td><td>20</td></tr>
+        <tr><td>02</td><td>Control &amp; Precision</td><td>10</td></tr>
+        <tr><td>03</td><td>Time Efficiency</td><td>10</td></tr>
+        <tr><td>04</td><td>Communication Clarity</td><td>10</td></tr>
+        <tr><td></td><td>TOTAL</td><td>50</td></tr>
       </tbody>
     </table>
-    <p style="color:var(--muted);font-size:.85rem;margin-top:.75rem;">
-      <b>Tiebreaker:</b> The team that completes the task in the least time ranks
-      higher. If still tied, priority goes to better communication and coordination
-      between participants.
-    </p>
+    <div class="tiebreaker-note">
+      <b>Tiebreaker Protocol:</b> The team completing the full gauntlet in the least time ranks higher. If still tied, judges evaluate communication clarity and controller precision as the final decider.
+    </div>
   </div>
 
-  <div class="divider"></div>
+  <hr class="div">
 
   <!-- RULES -->
-  <div class="ds">
-    <div class="ds-label">Rules &amp; Guidelines</div>
-    <div class="round">
-      <div class="round-name">Allowed</div>
-      <div class="round-body">
-        <ul>
-          <li>Verbal communication between the Controller and the Robot</li>
-          <li>Clear and strategic instructions within the given limits</li>
-          <li>Team coordination and planning <em>before</em> the round starts</li>
-          <li>Safe and controlled movement within the defined area</li>
+  <div class="sec reveal">
+    <div class="sec-label">// rules & guidelines</div>
+    <div class="rules-grid">
+      <div class="rule-card allowed">
+        <div class="rule-title">ALLOWED</div>
+        <ul class="rule-list">
+          <li>Verbal communication between Guide and Blindfolded Player</li>
+          <li>Clear and strategic instructions within limits</li>
+          <li>Pre-round team coordination and planning</li>
+          <li>Safe movement within the defined area</li>
+          <li>Role swaps between games</li>
         </ul>
       </div>
-    </div>
-    <div class="round">
-      <div class="round-name">Not Allowed</div>
-      <div class="round-body">
-        <ul>
-          <li>The Robot removing the blindfold during the round</li>
-          <li>Physical guidance &mdash; touching, holding, or pushing the Robot</li>
-          <li>Use of gestures or signals other than verbal instructions</li>
+      <div class="rule-card banned">
+        <div class="rule-title">NOT ALLOWED</div>
+        <ul class="rule-list">
+          <li>Blindfolded Player removing blindfold during active round</li>
+          <li>Physical guidance — touching, holding, or pushing</li>
+          <li>Gestures or non-verbal signals of any kind</li>
+          <li>Crossing the boundary of the activity area</li>
+          <li>Deliberate interference with other teams</li>
         </ul>
       </div>
     </div>
   </div>
 
-  <div class="divider"></div>
+  <hr class="div">
 
   <!-- HOSTS -->
-  <div class="ds">
-    <div class="ds-label">Event Hosts</div>
+  <div class="sec reveal">
+    <div class="sec-label">// event hosts</div>
     <div class="host-grid">
-      <div class="host-item">
-        <span class="host-tag">Host</span>
-        Aashi Mishra &mdash; Class XII-C
-      </div>
-      <div class="host-item">
-        <span class="host-tag">Host</span>
-        Ishant Chauhan &mdash; Class XII-B
-      </div>
-      <div class="host-item">
-        <span class="host-tag">Host</span>
-        Shashwat Trivedi &mdash; Class XI
-      </div>
-      <div class="host-item">
-        <span class="host-tag">Host</span>
-        Monisha &mdash; Class XI
-      </div>
-      <div class="host-item">
-        <span class="host-tag">Host</span>
-        Anika &mdash; Class XII-D
-      </div>
+      <div class="host-item"><span class="host-tag">Host</span>Aashi Mishra — Class XII-C</div>
+      <div class="host-item"><span class="host-tag">Host</span>Ishant Chauhan — Class XII-B</div>
+      <div class="host-item"><span class="host-tag">Host</span>Shashwat Trivedi — Class XI</div>
+      <div class="host-item"><span class="host-tag">Host</span>Monisha — Class XI</div>
+      <div class="host-item"><span class="host-tag">Host</span>Anika — Class XII-D</div>
     </div>
   </div>
 
-</div><!-- /detail-wrap -->
+</div><!-- /wrap -->
 
 <footer>
-  <div class="footer-logo">Tech<span>Quest</span></div>
-  <div>&copy; 2026 TechQuest Committee &mdash; All rights reserved</div>
+  <div class="footer-logo">Tech<span>Quest</span> 2026</div>
+  <div>&copy; 2026 TechQuest Committee — All rights reserved</div>
 </footer>
 
-<a href="#" id="topBtn">&uarr;</a>
+<a href="#" id="topBtn">↑</a>
+
+<script>
+  /* ── cursor ── */
+  const cur = document.getElementById('cursor');
+  const ring = document.getElementById('cursor-ring');
+  document.addEventListener('mousemove', e => {
+    cur.style.left = e.clientX + 'px';
+    cur.style.top  = e.clientY + 'px';
+    ring.style.left = e.clientX + 'px';
+    ring.style.top  = e.clientY + 'px';
+  });
+  document.querySelectorAll('a, button, .game-card, .stat-box, .meta-chip').forEach(el => {
+    el.addEventListener('mouseenter', () => { cur.classList.add('hovering'); ring.classList.add('hovering'); });
+    el.addEventListener('mouseleave', () => { cur.classList.remove('hovering'); ring.classList.remove('hovering'); });
+  });
+
+  /* ── particles ── */
+  const canvas = document.getElementById('particles-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [];
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const COLORS = ['rgba(176,109,255,', 'rgba(34,211,238,', 'rgba(217,70,239,'];
+
+  for (let i = 0; i < 60; i++) {
+    particles.push({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+      r: Math.random() * 1.5 + .3,
+      vx: (Math.random() - .5) * .3,
+      vy: (Math.random() - .5) * .3,
+      col: COLORS[Math.floor(Math.random() * COLORS.length)],
+      a: Math.random() * .6 + .1
+    });
+  }
+
+  function drawParticles() {
+    ctx.clearRect(0, 0, W, H);
+    particles.forEach(p => {
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+      if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = p.col + p.a + ')';
+      ctx.fill();
+    });
+
+    // draw connections
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < 120) {
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = `rgba(176,109,255,${.12 * (1 - dist/120)})`;
+          ctx.lineWidth = .5;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(drawParticles);
+  }
+  drawParticles();
+
+  /* ── scroll reveal ── */
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); }
+    });
+  }, { threshold: .08 });
+  reveals.forEach((el, i) => {
+    el.style.transitionDelay = (i * 0.04) + 's';
+    observer.observe(el);
+  });
+
+  /* ── game card hover tilt ── */
+  document.querySelectorAll('.game-card').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const rect = card.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - .5;
+      const y = (e.clientY - rect.top)  / rect.height - .5;
+      card.style.transform = `perspective(500px) rotateX(${-y*8}deg) rotateY(${x*8}deg) translateY(-4px)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = '';
+    });
+  });
+</script>
 
 </body>
 </html>
